@@ -314,8 +314,8 @@ register.html
 
 ### 🏆 Eco Rewards — `rewards.html`
 
-![rewards](https://via.placeholder.com/1280x640/92400e/ffffff?text=📸+Screenshot+→+screenshots/rewards.png)
-
+![rewards](gambar/gambar16.png)
+![reward](gambar/17.png)
 - Saldo Eco Points user ditampilkan di hero banner
 - Katalog: Tumbler (1.500 pts) | T-Shirt (2.500 pts) | Jaket (3.000 pts) | Donasi 10 Pohon (500 pts)
 - Redeem: cek saldo → konfirmasi → potong poin → simpan ke localStorage
@@ -325,8 +325,7 @@ register.html
 ### 🛒 Eco Market — `marketplace.html`
 
 ![marketplace](gambar/gambar7.png)
-
-![marketplace-cart](gambar/gambar9.pngg)
+![marketplace-cart](gambar/gambar9.png)
 
 
 - 12 produk UMKM (4 habis terjual = grayscale + disabled)
@@ -364,8 +363,8 @@ register.html
 
 ### 💬 Kontak — `kontak.html`
 
-![kontak](https://via.placeholder.com/1280x640/1e40af/ffffff?text=📸+Screenshot+→+screenshots/kontak.png)
-> Ganti dengan: `screenshots/kontak.png`
+![kontak](gambar/18.png)
+
 
 - Auto-fill nama & email jika login
 - Form: nama, email, subjek (dropdown 4 opsi), pesan
@@ -399,6 +398,7 @@ register.html
 ### 🤝 Daftar Mitra UMKM — `mitra.html`
 
 ![mitra](gambar/gambar15.png)
+![mitra](gambar/25.png)
 
 - Form: nama UMKM, WhatsApp, nama produk, harga, URL foto, deskripsi manfaat lingkungan
 - Auto-fill nama dari `currentUser`
@@ -408,8 +408,8 @@ register.html
 
 ### 📊 Transparansi — `transparansi.html`
 
-![transparansi](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/transparansi.png)
-> Ganti dengan: `screenshots/transparansi.png`
+![transparansi](gambar/19.png)
+![transparansi](gambar/20.png)
 
 - Donut chart alokasi dana: Bibit 60% / Operasional 25% / Edukasi 15%
 - Progress bar: Dana Terkumpul Rp 1,25M | Dana Disalurkan Rp 980jt
@@ -420,8 +420,7 @@ register.html
 
 ### 🛡️ Admin Dashboard — `admin.html`
 
-![admin-dashboard](https://via.placeholder.com/1280x640/052e16/ffffff?text=📸+Screenshot+→+screenshots/admin-dashboard.png)
-> Ganti dengan: `screenshots/admin-dashboard.png`
+![admin-dashboard](gambar/22.png)
 
 - Navbar khusus admin (dark green gradient + shimmer accent line)
 - Stat cards: Total User | Relawan Terdaftar | Total Donasi (Rp) | Newsletter Subs
@@ -433,8 +432,7 @@ register.html
 
 ### 👤 Manajemen User — `admin.html` (tab: users)
 
-![admin-users](https://via.placeholder.com/1280x640/052e16/ffffff?text=📸+Screenshot+→+screenshots/admin-users.png)
-> Ganti dengan: `screenshots/admin-users.png`
+![admin-users](gambar/23.png)
 
 - Search + filter role
 - Tabel: nama, email, role badge, pohon, poin, aksi (edit/hapus)
@@ -444,8 +442,7 @@ register.html
 
 ### 🌿 Monitoring Relawan — `admin.html` (tab: volunteers)
 
-![admin-volunteers](https://via.placeholder.com/1280x640/052e16/ffffff?text=📸+Screenshot+→+screenshots/admin-volunteers.png)
-> Ganti dengan: `screenshots/admin-volunteers.png`
+![admin-volunteers](gambar/24.png)
 
 - Tabel: nama user, event yang diikuti, tanggal, lokasi
 
@@ -453,8 +450,11 @@ register.html
 
 ### 🏪 Persetujuan UMKM — `admin.html` (tab: umkm)
 
-![admin-umkm](https://via.placeholder.com/1280x640/052e16/ffffff?text=📸+Screenshot+→+screenshots/admin-umkm.png)
-> Ganti dengan: `screenshots/admin-umkm.png`
+![admin-umkm](gambar/26.png)
+![admin-umkm](gambar/27.png)
+![admin-umkm](gambar/28.png)
+![admin-umkm](gambar/29.png)
+
 
 - Badge notifikasi jumlah pending di sidebar
 - Approve → `status = "approved"` | Reject → hapus dari queue
@@ -479,8 +479,7 @@ register.html
 
 ## Fitur PDF Generator
 
-![pdf-preview](https://via.placeholder.com/1280x320/1e3a5f/ffffff?text=📸+Screenshot+→+screenshots/pdf-preview.png)
-> Ganti dengan: `screenshots/pdf-preview.png`
+![pdf-preview](gambar/21.png)
 
 Semua PDF di-generate client-side menggunakan **jsPDF** tanpa server.
 
