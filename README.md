@@ -229,8 +229,7 @@ register.html
 
 ### 🏠 Landing Page — `index.html`
 
-![index](gambar1.png)
-> Ganti dengan: `screenshots/index.png`
+![index](gambar/gambar1.png)
 
 - Hero slider 4 slide (auto-play 5 detik, swipe support, teks dinamis per slide)
 - Impact counter animasi: 124.536 pohon | 2.615 ton CO2 | 842 petani
