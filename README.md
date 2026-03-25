@@ -4,6 +4,8 @@
 
 Platform reboisasi komunitas berbasis web untuk mendukung penghijauan Indonesia. Dibangun sepenuhnya dengan HTML, Tailwind CSS, dan Vanilla JavaScript — tanpa framework, tanpa build tool, tanpa backend. Semua data disimpan di `localStorage` browser sebagai simulasi database.
 
+> **Cara menambahkan screenshot nyata:** Buat folder `screenshots/` di root project, ambil screenshot setiap halaman, simpan sesuai nama file yang tertera di setiap bagian, lalu ganti URL `via.placeholder.com` dengan path relatif `screenshots/nama-file.png`.
+
 ---
 
 ## Daftar Isi
@@ -12,19 +14,15 @@ Platform reboisasi komunitas berbasis web untuk mendukung penghijauan Indonesia.
 2. [Struktur File](#struktur-file)
 3. [Cara Menjalankan](#cara-menjalankan)
 4. [Akun Default](#akun-default)
-5. [Arsitektur & Shared Logic (app.js)](#arsitektur--shared-logic-appjs)
+5. [Arsitektur & Shared Logic](#arsitektur--shared-logic-appjs)
 6. [localStorage Schema](#localstorage-schema)
-7. [Alur Lengkap Per Role](#alur-lengkap-per-role)
-   - [Guest (Belum Login)](#1-guest-belum-login)
-   - [User Terdaftar](#2-user-terdaftar)
-   - [Admin](#3-admin)
-8. [Detail Setiap Halaman](#detail-setiap-halaman)
-9. [Sistem Eco Points](#sistem-eco-points)
-10. [Fitur PDF Generator](#fitur-pdf-generator)
-11. [EcoBot AI (Groq)](#ecobot-ai-groq)
-12. [Internasionalisasi (i18n)](#internasionalisasi-i18n)
-13. [Peta Penanaman (Leaflet)](#peta-penanaman-leaflet)
-14. [Catatan Pengembangan](#catatan-pengembangan)
+7. [Detail Setiap Halaman & Screenshot](#detail-setiap-halaman--screenshot)
+8. [Sistem Eco Points](#sistem-eco-points)
+9. [Fitur PDF Generator](#fitur-pdf-generator)
+10. [EcoBot AI](#ecobot-ai-groq)
+11. [Internasionalisasi i18n](#internasionalisasi-i18n)
+12. [Peta Penanaman](#peta-penanaman-leaflet)
+13. [Catatan Pengembangan](#catatan-pengembangan)
 
 ---
 
@@ -66,6 +64,7 @@ eco-nusantara/
 ├── transparansi.html   → Laporan keuangan publik
 ├── kontak.html         → Form kontak
 ├── settings.html       → Pengaturan akun
+├── screenshots/        → Folder screenshot (buat manual)
 ├── js/
 │   └── app.js          → Shared logic (navbar, footer, auth, chatbot, dll)
 └── css/
@@ -118,8 +117,6 @@ localStorage.setItem('users', JSON.stringify(users));
 
 `js/app.js` adalah file inti yang di-load di semua halaman. Berisi:
 
-### Fungsi Utama
-
 | Fungsi | Deskripsi |
 |--------|-----------|
 | `initStorage()` | Seed data awal ke localStorage jika belum ada |
@@ -146,19 +143,13 @@ localStorage.setItem('users', JSON.stringify(users));
 | `filterEventsByDate()` | Filter event berdasarkan tanggal kalender |
 | `navSearch()` | Pencarian halaman via search bar navbar |
 
-### Hero Slider (IIFE)
+**Hero Slider (IIFE):** Auto-play 5 detik, navigasi prev/next, swipe touch, pause on hover. Teks berubah dinamis per slide via `slideData[]`.
 
-Auto-play slider 5 detik dengan navigasi manual (prev/next), swipe touch, dan pause on hover. Teks hero berubah dinamis per slide menggunakan `slideData[]`.
-
-### Sistem Terjemahan
-
-Objek `translations` berisi key-value untuk bahasa `id` dan `en`. Navbar membaca `localStorage.lang` untuk menentukan bahasa aktif.
+**Sistem Terjemahan:** Objek `translations` berisi key-value `id`/`en`. Navbar membaca `localStorage.lang`.
 
 ---
 
 ## localStorage Schema
-
-### Key yang Digunakan
 
 | Key | Tipe | Isi |
 |-----|------|-----|
@@ -170,8 +161,6 @@ Objek `translations` berisi key-value untuk bahasa `id` dan `en`. Navbar membaca
 | `umkm_queue` | `Array<UMKMSubmission>` | Antrian pengajuan produk mitra |
 | `lang` | `"id" \| "en"` | Bahasa aktif |
 
-### Skema Objek User
-
 ```json
 {
   "id": 1700000000000,
@@ -182,285 +171,308 @@ Objek `translations` berisi key-value untuk bahasa `id` dan `en`. Navbar membaca
   "role": "user",
   "points": 150,
   "treesAdopted": 3,
-  "donations": [
-    {
-      "date": "2026-03-25T10:00:00.000Z",
-      "amount": 150000,
-      "trees": 3,
-      "location": "Muara Gembong Mangrove"
-    }
-  ],
-  "joinedEvents": [
-    {
-      "name": "Aksi Tanam 1.000 Mangrove",
-      "date": "2026-03-25",
-      "location": "Pantai Muara Gembong"
-    }
-  ]
-}
-```
-
-### Skema Objek UMKM Submission
-
-```json
-{
-  "id": 1700000000000,
-  "userEmail": "mitra@email.com",
-  "umkm": "Nama Usaha",
-  "phone": "0812...",
-  "product": "Nama Produk",
-  "price": "50000",
-  "image": "https://...",
-  "desc": "Manfaat lingkungan produk",
-  "status": "pending"
+  "donations": [{ "date": "2026-03-25T10:00:00.000Z", "amount": 150000, "trees": 3, "location": "Muara Gembong Mangrove" }],
+  "joinedEvents": [{ "name": "Aksi Tanam 1.000 Mangrove", "date": "2026-03-25", "location": "Pantai Muara Gembong" }]
 }
 ```
 
 ---
 
-## Alur Lengkap Per Role
-
-### 1. Guest (Belum Login)
-
-```
-index.html
-  ├── Hero slider 4 slide (auto-play 5 detik, swipe support)
-  ├── Impact counter: 124.536 pohon | 2.615 ton CO2 | 842 petani
-  ├── Preview 3 event mendatang → events.html
-  ├── Testimoni carousel (Swiper.js)
-  ├── Navbar: Home, Peta, Donasi, Edukasi, Eco Market, Transparansi, Events
-  ├── Search bar navbar (fuzzy search ke semua halaman)
-  └── EcoBot AI (floating button kanan bawah)
-
-donasi.html (tanpa login)
-  ├── Form tampil dengan field nama & email (guest mode)
-  ├── Peringatan kuning: "Donasi sebagai Anonim"
-  ├── Pilih area penanaman (6 opsi + "Terserah Tim")
-  ├── Pilih jumlah: 1/3/10 pohon atau custom nominal
-  ├── Tipe: Sekali Bayar atau Bulanan (Recurring)
-  ├── Metode: QRIS / BCA VA / Mandiri VA / Kartu Kredit
-  ├── Simulasi loading 1.5 detik → sukses
-  ├── Data TIDAK tersimpan ke localStorage (guest)
-  └── Download invoice PDF (jsPDF)
-
-peta.html
-  ├── Peta Leaflet.js (OpenStreetMap)
-  ├── 5 marker lokasi: Muara Gembong, Lembang, Leuser, Merbabu, Kalimantan
-  ├── Warna marker: merah (kritis), kuning (pemulihan), hijau (sukses)
-  ├── Popup per marker: foto, survival rate, jumlah pohon, tombol adopsi
-  ├── Filter: provinsi + jenis pohon (checkbox)
-  └── Klik "Adopsi Pohon di Sini" → redirect ke donasi.html?area=...
-
-register.html
-  ├── Form: nama, telepon, email, password, konfirmasi password
-  ├── Validasi: password min 6 karakter, password match, email unik
-  ├── Simpan ke localStorage users[]
-  ├── Auto-login setelah daftar
-  └── Redirect ke dashboard.html
-```
+## Detail Setiap Halaman & Screenshot
 
 ---
 
-### 2. User Terdaftar
+### 🏠 Landing Page — `index.html`
 
-```
-login.html
-  ├── Form email + password
-  ├── Fitur "Ingat Saya" (simpan ke localStorage)
-  ├── Tombol Login Google (simulasi: ambil user terakhir dari users[])
-  ├── Redirect: role=admin → admin.html | role=user → dashboard.html
-  └── Auto-redirect jika sudah login
+![index](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/index.png)
+> Ganti dengan: `screenshots/index.png`
 
-dashboard.html (protectRoute)
-  ├── Greeting: "Halo, [Nama]! 👋"
-  ├── Notifikasi H-3: banner oranye jika ada event dalam 3 hari
-  ├── Stat cards:
-  │   ├── Pohon Diadopsi (dari user.treesAdopted)
-  │   ├── Dampak Karbon: treesAdopted × 21 kg CO2/tahun
-  │   └── Eco Points (klik → redirect ke rewards.html)
-  ├── Tabel riwayat donasi (tanggal, lokasi, jumlah pohon, nominal)
-  ├── Agenda volunteer yang diikuti (dari user.joinedEvents[])
-  ├── Status level: Eco Warrior + progress bar
-  ├── Tombol "Adopsi Lagi" → donasi.html
-  └── Card e-Sertifikat (muncul jika ada riwayat donasi) → download PDF
-
-donasi.html (user login)
-  ├── Field nama & email tersembunyi (auto-fill dari currentUser)
-  ├── Redirect dari peta.html: auto-select area via ?area= query param
-  ├── Setelah sukses:
-  │   ├── user.treesAdopted += jumlah pohon
-  │   ├── user.points += jumlah pohon × 10
-  │   ├── donations[].unshift({ date, amount, trees, location })
-  │   └── Simpan ke users[] dan currentUser di localStorage
-  └── Download invoice PDF (nama, lokasi, jumlah, metode, LUNAS stamp)
-
-events.html
-  ├── Filter: lokasi, jenis kegiatan, kalender tanggal
-  ├── 3 event tersedia:
-  │   ├── 25 Mar 2026 - Aksi Tanam 1.000 Mangrove (kuota 15/50)
-  │   ├── 02 Apr 2026 - Rehabilitasi Koridor Orangutan (PENUH 40/40)
-  │   └── 14 Apr 2026 - Edukasi Tani & Tanam Pohon (kuota 20/50)
-  ├── Klik "Daftar Sekarang":
-  │   ├── Cek login → jika belum, prompt login
-  │   ├── Cek duplikat pendaftaran
-  │   ├── Simpan ke user.joinedEvents[]
-  │   └── Redirect ke dashboard.html
-  └── Filter kalender: 2026-03-25, 2026-04-02, 2026-04-14
-
-rewards.html (protectRoute)
-  ├── Tampilkan saldo Eco Points user
-  ├── Katalog 4 item:
-  │   ├── Tumbler Eksklusif → 1.500 pts
-  │   ├── T-Shirt Relawan Limited → 2.500 pts
-  │   ├── Jaket Outdoor Relawan → 3.000 pts
-  │   └── Donasi Ekstra 10 Pohon → 500 pts
-  ├── Klik Redeem:
-  │   ├── Cek saldo cukup
-  │   ├── Konfirmasi SweetAlert2
-  │   ├── Potong poin dari user.points
-  │   └── Jika "Donasi 10 Pohon": tambah treesAdopted += 10 + entry donations[]
-
-marketplace.html
-  ├── 12 produk UMKM (4 habis terjual = grayscale + disabled)
-  ├── Search real-time (nama, seller, deskripsi)
-  ├── Keranjang belanja (add, qty +/-, remove)
-  ├── Modal pembayaran: QRIS atau BCA VA
-  ├── Setelah bayar: modal sukses + form nama & lokasi penerima
-  └── Download invoice PDF (tabel item, subtotal, donasi 10%, LUNAS stamp)
-
-komunitas.html
-  ├── Greeting personal jika login
-  ├── Tombol gabung grup WhatsApp Econusa (5.000+ anggota)
-  ├── Leaderboard top 4 donatur (data statis)
-  ├── Posisi user sendiri di leaderboard (dari user.points)
-  ├── 2 grup lokal: Sobat Mangrove Jakarta, Relawan IKN Hijau
-  └── Klik grup → konfirmasi → buka link WhatsApp
-
-edukasi.html
-  ├── Hero dengan background image
-  ├── Filter artikel: Semua / Jenis Pohon / Krisis Iklim / Tutorial
-  ├── 4 artikel dengan tombol "Baca Selengkapnya" → modal SweetAlert2
-  │   ├── Mangrove (Jenis Pohon)
-  │   ├── Kompos Organik (Tutorial)
-  │   ├── Deforestasi Kalimantan (Krisis Iklim)
-  │   └── Kenaikan Air Laut Jawa (Krisis Iklim)
-  └── Kuis Harian (5 pertanyaan, +20 pts per jawaban benar)
-      ├── Jawaban benar/salah → SweetAlert2 → lanjut otomatis
-      ├── Selesai: total poin ditampilkan
-      └── Poin disimpan ke user.points (jika login)
-
-kontak.html
-  ├── Auto-fill nama & email jika login
-  ├── Form: nama, email, subjek (dropdown), pesan
-  ├── Simulasi kirim (loading 1.5 detik → sukses)
-  └── Info kontak: email, WhatsApp, alamat kantor, sosial media
-
-settings.html (protectRoute)
-  ├── Auto-fill data profil dari currentUser
-  ├── Update nama & telepon → simpan ke users[] dan currentUser
-  ├── Ganti password (min 6 karakter, harus match)
-  └── Hapus akun permanen:
-      ├── Konfirmasi SweetAlert2
-      ├── Hapus dari users[]
-      └── Logout + redirect
-
-about.html
-  ├── Hero banner
-  ├── Narasi "Mengapa Kami Mulai?"
-  └── Galeri Before-After (Swiper.js, 2 slide):
-      ├── Restorasi Lahan Bekas Tambang Kaltim (2019 vs 2025)
-      └── Sabuk Hijau Mangrove Demak (2023 vs 2025)
-
-mitra.html (protectRoute)
-  ├── Form: nama UMKM, WhatsApp, nama produk, harga, URL foto, deskripsi
-  ├── Auto-fill nama dari currentUser
-  ├── Submit → simpan ke localStorage umkm_queue[]
-  └── Status: "pending" (menunggu approval admin)
-
-transparansi.html
-  ├── Donut chart alokasi dana: Bibit 60% / Operasional 25% / Edukasi 15%
-  ├── Progress bar: Dana Terkumpul Rp 1,25M | Dana Disalurkan Rp 980jt
-  ├── Download Laporan Audit PDF (jsPDF)
-  └── 2 card before-after lapangan:
-      ├── Kalimantan → modal laporan lapangan detail
-      └── Jawa Barat → modal laporan lapangan detail
-```
+- Hero slider 4 slide (auto-play 5 detik, swipe support, teks dinamis per slide)
+- Impact counter animasi: 124.536 pohon | 2.615 ton CO2 | 842 petani
+- Preview 3 event mendatang → `events.html`
+- Testimoni carousel (Swiper.js, 3 slide)
+- EcoBot AI floating button kanan bawah
 
 ---
 
-### 3. Admin
+### 🔐 Login — `login.html`
 
-```
-login.html → admin.html (protectAdminRoute)
+![login](https://via.placeholder.com/1280x640/1e40af/ffffff?text=📸+Screenshot+→+screenshots/login.png)
+> Ganti dengan: `screenshots/login.png`
 
-admin.html
-├── Navbar khusus admin (dark green gradient, shimmer accent line)
-├── Sidebar desktop + mobile drawer
-├── Toggle bahasa ID/EN (adminToggleLang)
-└── 4 Section (switchSection):
+- Form email + password
+- Fitur "Ingat Saya" (simpan ke localStorage)
+- Tombol Login Google (simulasi: ambil user terakhir dari `users[]`)
+- Redirect: `role=admin` → `admin.html` | `role=user` → `dashboard.html`
+- Auto-redirect jika sudah login
 
-  [Dashboard]
-  ├── Stat cards: Total User, Relawan Terdaftar, Total Donasi (Rp), Newsletter Subs
-  ├── Tabel monitoring: semua user + agenda diikuti + total donasi
-  ├── Tombol "Reset Database" (clearDummyData)
-  ├── Bar chart: Tren Donasi Tahunan (Chart.js)
-  └── Donut chart: Distribusi Pohon per Area (Chart.js)
+---
 
-  [Manajemen User]
-  ├── Stat cards: Total User, Jumlah Admin, Relawan Aktif
-  ├── Search bar (nama/email) + filter dropdown (role)
-  ├── Tabel: nama, email, role badge, pohon, poin, aksi
-  ├── Tombol Tambah User → modal form
-  ├── Edit user → modal pre-filled
-  └── Hapus user → konfirmasi SweetAlert2
+### 📝 Registrasi — `register.html`
 
-  [Monitoring Relawan]
-  └── Tabel: siapa mendaftar event apa, tanggal, lokasi
+![register](https://via.placeholder.com/1280x640/1e40af/ffffff?text=📸+Screenshot+→+screenshots/register.png)
+> Ganti dengan: `screenshots/register.png`
 
-  [Persetujuan UMKM]
-  ├── Badge notifikasi jumlah pending di sidebar
-  ├── Tabel: nama UMKM, produk, harga, status
-  ├── Tombol Approve → status = "approved"
-  └── Tombol Reject → hapus dari queue
-```
+- Form: nama, telepon, email, password, konfirmasi password
+- Validasi: password min 6 karakter, password match, email unik
+- Auto-login setelah daftar → redirect ke `dashboard.html`
+
+---
+
+### 📊 Dashboard User — `dashboard.html`
+
+![dashboard](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/dashboard.png)
+> Ganti dengan: `screenshots/dashboard.png`
+
+- Greeting: "Halo, [Nama]! 👋"
+- Banner notifikasi H-3 (oranye) jika ada event dalam 3 hari
+- Stat cards: Pohon Diadopsi | CO2 (`treesAdopted × 21 kg/thn`) | Eco Points
+- Tabel riwayat donasi (tanggal, lokasi, jumlah pohon, nominal)
+- Agenda volunteer dari `user.joinedEvents[]`
+- Status level Eco Warrior + progress bar
+- Card e-Sertifikat → download PDF (muncul jika ada riwayat donasi)
+
+---
+
+### 🌱 Donasi Pohon — `donasi.html`
+
+![donasi](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/donasi.png)
+> Ganti dengan: `screenshots/donasi.png`
+
+- Guest mode: field nama & email tampil + banner peringatan anonim
+- Login mode: nama & email auto-fill, field tersembunyi
+- Pilih area penanaman (6 lokasi + "Terserah Tim")
+- Pilih jumlah: 1 / 3 / 10 pohon atau custom nominal (min Rp 50.000)
+- Tipe: Sekali Bayar atau Bulanan (Recurring)
+- Metode: QRIS / BCA VA / Mandiri VA / Kartu Kredit
+- Setelah sukses: `treesAdopted++`, `points += trees × 10`, entry `donations[]`
+- Download invoice PDF dengan LUNAS stamp
+
+---
+
+### 🗺️ Peta Penanaman — `peta.html`
+
+![peta](https://via.placeholder.com/1280x640/0f766e/ffffff?text=📸+Screenshot+→+screenshots/peta.png)
+> Ganti dengan: `screenshots/peta.png`
+
+![peta-popup](https://via.placeholder.com/1280x640/0f766e/ffffff?text=📸+Screenshot+→+screenshots/peta-popup.png)
+> Ganti dengan: `screenshots/peta-popup.png` (popup marker terbuka)
+
+- Peta Leaflet.js (OpenStreetMap tile)
+- 5 marker: merah (kritis), kuning (pemulihan), hijau (sukses)
+- Popup: foto lokasi, survival rate, jumlah pohon, tombol adopsi
+- Filter sidebar: provinsi + jenis pohon (checkbox)
+- Klik "Adopsi Pohon di Sini" → redirect `donasi.html?area=...`
+
+---
+
+### 📅 Agenda Volunteer — `events.html`
+
+![events](https://via.placeholder.com/1280x640/92400e/ffffff?text=📸+Screenshot+→+screenshots/events.png)
+> Ganti dengan: `screenshots/events.png`
+
+- Filter: lokasi, jenis kegiatan, kalender tanggal
+- 3 event: 25 Mar (Mangrove), 02 Apr (Orangutan/PENUH), 14 Apr (Edukasi Tani)
+- Daftar → cek login → cek duplikat → simpan ke `user.joinedEvents[]` → redirect dashboard
+
+---
+
+### 🏆 Eco Rewards — `rewards.html`
+
+![rewards](https://via.placeholder.com/1280x640/92400e/ffffff?text=📸+Screenshot+→+screenshots/rewards.png)
+> Ganti dengan: `screenshots/rewards.png`
+
+- Saldo Eco Points user ditampilkan di hero banner
+- Katalog: Tumbler (1.500 pts) | T-Shirt (2.500 pts) | Jaket (3.000 pts) | Donasi 10 Pohon (500 pts)
+- Redeem: cek saldo → konfirmasi → potong poin → simpan ke localStorage
+
+---
+
+### 🛒 Eco Market — `marketplace.html`
+
+![marketplace](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/marketplace.png)
+> Ganti dengan: `screenshots/marketplace.png`
+
+![marketplace-cart](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/marketplace-cart.png)
+> Ganti dengan: `screenshots/marketplace-cart.png` (modal keranjang terbuka)
+
+- 12 produk UMKM (4 habis terjual = grayscale + disabled)
+- Search real-time (nama, seller, deskripsi)
+- Keranjang: add, qty +/-, remove
+- Modal pembayaran: QRIS atau BCA VA
+- Download invoice PDF (tabel item, subtotal, donasi 10%, LUNAS stamp)
+
+---
+
+### 👥 Komunitas — `komunitas.html`
+
+![komunitas](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/komunitas.png)
+> Ganti dengan: `screenshots/komunitas.png`
+
+- Greeting personal jika login
+- Tombol gabung grup WhatsApp Econusa (5.000+ anggota)
+- Leaderboard top 4 donatur
+- Posisi user sendiri di leaderboard (dari `user.points`)
+- 2 grup lokal dengan link WhatsApp masing-masing
+
+---
+
+### 📚 Edukasi & Kuis — `edukasi.html`
+
+![edukasi](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/edukasi.png)
+> Ganti dengan: `screenshots/edukasi.png`
+
+![edukasi-kuis](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/edukasi-kuis.png)
+> Ganti dengan: `screenshots/edukasi-kuis.png` (section kuis harian)
+
+- Filter artikel: Semua / Jenis Pohon / Krisis Iklim / Tutorial
+- 4 artikel → modal SweetAlert2 dengan referensi sumber resmi
+- Kuis Harian 5 soal, +20 pts per jawaban benar, poin tersimpan ke user
+
+---
+
+### 💬 Kontak — `kontak.html`
+
+![kontak](https://via.placeholder.com/1280x640/1e40af/ffffff?text=📸+Screenshot+→+screenshots/kontak.png)
+> Ganti dengan: `screenshots/kontak.png`
+
+- Auto-fill nama & email jika login
+- Form: nama, email, subjek (dropdown 4 opsi), pesan
+- Simulasi kirim loading 1.5 detik → sukses
+- Info: email, WhatsApp, alamat kantor, sosial media
+
+---
+
+### ⚙️ Pengaturan Akun — `settings.html`
+
+![settings](https://via.placeholder.com/1280x640/374151/ffffff?text=📸+Screenshot+→+screenshots/settings.png)
+> Ganti dengan: `screenshots/settings.png`
+
+- Update nama & telepon
+- Ganti password (min 6 karakter, harus match)
+- Danger Zone: hapus akun permanen → konfirmasi → logout
+
+---
+
+### ℹ️ Tentang Kami — `about.html`
+
+![about](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/about.png)
+> Ganti dengan: `screenshots/about.png`
+
+- Narasi "Mengapa Kami Mulai?"
+- Galeri Before-After Swiper.js (2 slide):
+  - Restorasi Lahan Bekas Tambang Kaltim (2019 vs 2025)
+  - Sabuk Hijau Mangrove Demak (2023 vs 2025)
+
+---
+
+### 🤝 Daftar Mitra UMKM — `mitra.html`
+
+![mitra](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/mitra.png)
+> Ganti dengan: `screenshots/mitra.png`
+
+- Form: nama UMKM, WhatsApp, nama produk, harga, URL foto, deskripsi manfaat lingkungan
+- Auto-fill nama dari `currentUser`
+- Submit → masuk `umkm_queue[]` dengan status `"pending"`
+
+---
+
+### 📊 Transparansi — `transparansi.html`
+
+![transparansi](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/transparansi.png)
+> Ganti dengan: `screenshots/transparansi.png`
+
+- Donut chart alokasi dana: Bibit 60% / Operasional 25% / Edukasi 15%
+- Progress bar: Dana Terkumpul Rp 1,25M | Dana Disalurkan Rp 980jt
+- Download Laporan Audit PDF
+- 2 card lapangan → modal laporan detail (Kalimantan & Jawa Barat)
+
+---
+
+### 🛡️ Admin Dashboard — `admin.html`
+
+![admin-dashboard](https://via.placeholder.com/1280x640/052e16/ffffff?text=📸+Screenshot+→+screenshots/admin-dashboard.png)
+> Ganti dengan: `screenshots/admin-dashboard.png`
+
+- Navbar khusus admin (dark green gradient + shimmer accent line)
+- Stat cards: Total User | Relawan Terdaftar | Total Donasi (Rp) | Newsletter Subs
+- Tabel monitoring semua user
+- Bar chart tren donasi tahunan + Donut chart distribusi pohon (Chart.js)
+- Tombol Reset Database
+
+---
+
+### 👤 Manajemen User — `admin.html` (tab: users)
+
+![admin-users](https://via.placeholder.com/1280x640/052e16/ffffff?text=📸+Screenshot+→+screenshots/admin-users.png)
+> Ganti dengan: `screenshots/admin-users.png`
+
+- Search + filter role
+- Tabel: nama, email, role badge, pohon, poin, aksi (edit/hapus)
+- Modal tambah & edit user
+
+---
+
+### 🌿 Monitoring Relawan — `admin.html` (tab: volunteers)
+
+![admin-volunteers](https://via.placeholder.com/1280x640/052e16/ffffff?text=📸+Screenshot+→+screenshots/admin-volunteers.png)
+> Ganti dengan: `screenshots/admin-volunteers.png`
+
+- Tabel: nama user, event yang diikuti, tanggal, lokasi
+
+---
+
+### 🏪 Persetujuan UMKM — `admin.html` (tab: umkm)
+
+![admin-umkm](https://via.placeholder.com/1280x640/052e16/ffffff?text=📸+Screenshot+→+screenshots/admin-umkm.png)
+> Ganti dengan: `screenshots/admin-umkm.png`
+
+- Badge notifikasi jumlah pending di sidebar
+- Approve → `status = "approved"` | Reject → hapus dari queue
 
 ---
 
 ## Sistem Eco Points
 
-| Aktivitas | Poin Didapat |
-|-----------|-------------|
+![ecopoints](https://via.placeholder.com/1280x320/92400e/ffffff?text=📸+Screenshot+→+screenshots/ecopoints.png)
+> Ganti dengan: `screenshots/ecopoints.png`
+
+| Aktivitas | Poin |
+|-----------|------|
 | Adopsi 1 pohon via donasi | +10 pts |
 | Jawab kuis benar (per soal) | +20 pts |
-| Redeem Tumbler | -1.500 pts |
-| Redeem T-Shirt | -2.500 pts |
-| Redeem Jaket | -3.000 pts |
+| Redeem Tumbler Eksklusif | -1.500 pts |
+| Redeem T-Shirt Relawan | -2.500 pts |
+| Redeem Jaket Outdoor | -3.000 pts |
 | Redeem Donasi 10 Pohon | -500 pts |
-
-Poin disimpan di `user.points` dan `users[i].points` di localStorage.
 
 ---
 
 ## Fitur PDF Generator
 
+![pdf-preview](https://via.placeholder.com/1280x320/1e3a5f/ffffff?text=📸+Screenshot+→+screenshots/pdf-preview.png)
+> Ganti dengan: `screenshots/pdf-preview.png`
+
 Semua PDF di-generate client-side menggunakan **jsPDF** tanpa server.
 
-| File PDF | Halaman | Isi |
-|----------|---------|-----|
-| `Invoice_Donasi_EcoNusantara.pdf` | `donasi.html` | Header, tabel pohon, total, metode, LUNAS stamp, dampak lingkungan |
-| `Invoice_[Nama]_EcoNusantara.pdf` | `marketplace.html` | Tabel item, subtotal, donasi 10%, LUNAS stamp |
-| `Sertifikat_Adopsi_[Nama].pdf` | `dashboard.html` | Sertifikat landscape A5, nama donatur, jumlah pohon, tanggal, stempel verified |
-| `Laporan_Audit_EcoNusantara_Q1_2026.pdf` | `transparansi.html` | Ringkasan keuangan, alokasi dana, tanggal unduh |
+| File PDF | Halaman | Screenshot | Isi |
+|----------|---------|------------|-----|
+| `Invoice_Donasi_EcoNusantara.pdf` | `donasi.html` | `screenshots/pdf-donasi.png` | Header, tabel pohon, total, LUNAS stamp, dampak CO2 |
+| `Invoice_[Nama]_EcoNusantara.pdf` | `marketplace.html` | `screenshots/pdf-market.png` | Tabel item, subtotal, donasi 10%, LUNAS stamp |
+| `Sertifikat_Adopsi_[Nama].pdf` | `dashboard.html` | `screenshots/pdf-sertifikat.png` | Landscape A5, nama donatur, jumlah pohon, stempel verified |
+| `Laporan_Audit_Q1_2026.pdf` | `transparansi.html` | `screenshots/pdf-audit.png` | Ringkasan keuangan, alokasi dana, tanggal unduh |
 
 ---
 
 ## EcoBot AI (Groq)
 
-Chatbot floating di semua halaman, powered by **Groq API** dengan model `llama-3.3-70b-versatile`.
+![ecobot](https://via.placeholder.com/1280x640/065f46/ffffff?text=📸+Screenshot+→+screenshots/ecobot.png)
+> Ganti dengan: `screenshots/ecobot.png`
 
-- System prompt: pakar lingkungan EcoNusantara, fokus deforestasi & reboisasi Indonesia
-- Tampil sebagai tombol hijau kanan bawah
-- Modal chat 480px dengan area scroll
+Chatbot floating di semua halaman, powered by **Groq API** model `llama-3.3-70b-versatile`.
+
+- System prompt: pakar lingkungan, fokus deforestasi & reboisasi Indonesia
+- Tombol hijau kanan bawah, modal chat 480px
 - Indikator "EcoBot sedang berpikir..." saat menunggu respons
 - Fallback error message jika API gagal
 
@@ -470,13 +482,12 @@ Chatbot floating di semua halaman, powered by **Groq API** dengan model `llama-3
 
 ## Internasionalisasi (i18n)
 
-Mendukung 2 bahasa: **Indonesia (id)** dan **English (en)**.
+![i18n](https://via.placeholder.com/1280x320/1e40af/ffffff?text=📸+Screenshot+→+screenshots/i18n-en.png)
+> Ganti dengan: `screenshots/i18n-en.png` (navbar dalam mode bahasa EN)
 
-- Toggle via tombol `ID/EN` di navbar
-- Bahasa disimpan di `localStorage.lang`
-- Halaman reload otomatis setelah toggle
+- Toggle tombol `ID/EN` di navbar
+- Bahasa disimpan di `localStorage.lang`, halaman reload otomatis
 - Terjemahan mencakup semua label navbar dan teks panel admin
-- Konten halaman (artikel, form) belum diterjemahkan (hanya UI chrome)
 
 ---
 
@@ -492,8 +503,6 @@ Mendukung 2 bahasa: **Indonesia (id)** dan **English (en)**.
 | Lahan Kritis Merbabu | Jawa Tengah | Beringin | Kritis | N/A |
 | Restorasi Gambut | Kalimantan | Mahoni | Kritis | 40% |
 
-Popup setiap marker berisi foto lokasi, survival rate, jumlah pohon ditanam, dan tombol "Adopsi Pohon di Sini" yang redirect ke `donasi.html?area=[nama_lokasi]`.
-
 ---
 
 ## Catatan Pengembangan
@@ -503,5 +512,4 @@ Popup setiap marker berisi foto lokasi, survival rate, jumlah pohon ditanam, dan
 - API Key Groq tersimpan di client-side (tidak aman untuk produksi)
 - Donasi guest tidak tersimpan (hanya user login yang datanya persisten)
 - Statistik landing page (124.536 pohon, dll) adalah data statis hardcoded
-- Leaderboard komunitas menggunakan data dummy statis
-- Untuk deployment produksi, diperlukan: backend API, database, autentikasi proper, dan environment variables
+- Untuk deployment produksi diperlukan: backend API, database, autentikasi proper, environment variables
