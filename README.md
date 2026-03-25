@@ -178,7 +178,7 @@ localStorage.setItem('users', JSON.stringify(users));
 
 ---
 
-<<<<<<< HEAD
+
 ## Detail Setiap Halaman & Screenshot
 =======
 ## Alur Lengkap Per Role
@@ -195,7 +195,6 @@ index.html
   ├── Search bar navbar (fuzzy search ke semua halaman)
   └── EcoBot AI (floating button kanan bawah)
 
-![Uploading image.png…]()
 
 
 donasi.html (tanpa login)
@@ -224,13 +223,13 @@ register.html
   ├── Auto-login setelah daftar
   └── Redirect ke dashboard.html
 ```
->>>>>>> aaf99386c46fcad6494289bf898c59320d5ea0aa
+
 
 ---
 
 ### 🏠 Landing Page — `index.html`
 
-![index](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/index.png)
+![index](C:\Users\ASUS\EcoNusantara - U-Idea\gambar1.png)
 > Ganti dengan: `screenshots/index.png`
 
 - Hero slider 4 slide (auto-play 5 detik, swipe support, teks dinamis per slide)
