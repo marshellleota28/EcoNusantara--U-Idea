@@ -315,7 +315,6 @@ register.html
 ### 🏆 Eco Rewards — `rewards.html`
 
 ![rewards](https://via.placeholder.com/1280x640/92400e/ffffff?text=📸+Screenshot+→+screenshots/rewards.png)
-> Ganti dengan: `screenshots/rewards.png`
 
 - Saldo Eco Points user ditampilkan di hero banner
 - Katalog: Tumbler (1.500 pts) | T-Shirt (2.500 pts) | Jaket (3.000 pts) | Donasi 10 Pohon (500 pts)
@@ -327,9 +326,8 @@ register.html
 
 ![marketplace](gambar/gambar7.png)
 
+![marketplace-cart](gambar/gambar9.pngg)
 
-![marketplace-cart](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/marketplace-cart.png)
-> Ganti dengan: `screenshots/marketplace-cart.png` (modal keranjang terbuka)
 
 - 12 produk UMKM (4 habis terjual = grayscale + disabled)
 - Search real-time (nama, seller, deskripsi)
@@ -341,8 +339,8 @@ register.html
 
 ### 👥 Komunitas — `komunitas.html`
 
-![komunitas](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/komunitas.png)
-> Ganti dengan: `screenshots/komunitas.png`
+![komunitas](gambar/gambar10.png)
+![komunitas](gambar/gambar11.png)
 
 - Greeting personal jika login
 - Tombol gabung grup WhatsApp Econusa (5.000+ anggota)
@@ -354,11 +352,9 @@ register.html
 
 ### 📚 Edukasi & Kuis — `edukasi.html`
 
-![edukasi](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/edukasi.png)
-> Ganti dengan: `screenshots/edukasi.png`
+![edukasi](gambar/gambar12.png)
 
-![edukasi-kuis](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/edukasi-kuis.png)
-> Ganti dengan: `screenshots/edukasi-kuis.png` (section kuis harian)
+![edukasi-kuis](gambar/gambar13.png)
 
 - Filter artikel: Semua / Jenis Pohon / Krisis Iklim / Tutorial
 - 4 artikel → modal SweetAlert2 dengan referensi sumber resmi
@@ -380,8 +376,7 @@ register.html
 
 ### ⚙️ Pengaturan Akun — `settings.html`
 
-![settings](https://via.placeholder.com/1280x640/374151/ffffff?text=📸+Screenshot+→+screenshots/settings.png)
-> Ganti dengan: `screenshots/settings.png`
+![settings](gambar/gambar14.png)
 
 - Update nama & telepon
 - Ganti password (min 6 karakter, harus match)
@@ -403,8 +398,7 @@ register.html
 
 ### 🤝 Daftar Mitra UMKM — `mitra.html`
 
-![mitra](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/mitra.png)
-> Ganti dengan: `screenshots/mitra.png`
+![mitra](gambar/gambar15.png)
 
 - Form: nama UMKM, WhatsApp, nama produk, harga, URL foto, deskripsi manfaat lingkungan
 - Auto-fill nama dari `currentUser`
