@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donasi - Eco Nusantara</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <div id="navbar-container"></div>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 flex flex-col lg:flex-row gap-8 lg:gap-12">
+        
+        <!-- Info & Impact Summary -->
+        <div class="lg:w-5/12">
+            <h1 class="text-3xl sm:text-4xl font-extrabold font-serif text-green-900 mb-4">Adopsi Pohon Sekarang</h1>
+            <p class="text-lg text-gray-600 mb-8">Setiap Rp 50.000 mendanai 1 pohon baru termasuk biaya perawatan selama 2 tahun oleh petani lokal.</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 mb-8">
+                <h3 class="font-bold text-gray-900 mb-4">Dalam setiap donasi Anda:</h3>
+                <ul class="space-y-4">
+                    <li class="flex items-start text-sm text-gray-700">
+                        <div class="bg-green-100 p-2 rounded-full mr-3"><i data-lucide="leaf" class="w-4 h-4 text-green-700"></i></div>
+                        <div><strong>Pemilihan Bibit Berkualitas:</strong> Disemai langsung oleh kelompok tani hutan terverifikasi.</div>
+                    </li>
+                    <li class="flex items-start text-sm text-gray-700">
+                        <div class="bg-blue-100 p-2 rounded-full mr-3"><i data-lucide="droplets" class="w-4 h-4 text-blue-700"></i></div>
+                        <div><strong>Perawatan 2 Tahun:</strong> Menjamin survival rate tinggi dan mengganti pohon yang mati.</div>
+                    </li>
+                    <li class="flex items-start text-sm text-gray-700">
+                        <div class="bg-yellow-100 p-2 rounded-full mr-3"><i data-lucide="file-check-2" class="w-4 h-4 text-yellow-700"></i></div>
+                        <div><strong>Invoice Digital:</strong> Bukti adopsi yang bisa Anda download segera setelah pembayaran sukses.</div>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Auth warning -->
+            <div id="auth-warning" class="hidden bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i data-lucide="alert-circle" class="h-5 w-5 text-yellow-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            Anda mendonasi sebagai Anonim (Guest). <br/>
+                            <a href="login.html" class="font-bold underline hover:text-yellow-800">Login</a> atau <a href="register.html" class="font-bold underline hover:text-yellow-800">Daftar</a> untuk menyimpan riwayat dan mendapatkan poin rewards.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Donation Form -->
+        <div class="lg:w-7/12">
+            <div class="bg-white rounded-3xl shadow-xl p-6 sm:p-8 border border-gray-100">
+                <form id="donation-form" onsubmit="handleDonation(event)">
+                    
+                    <!-- Area (Optional, pre-filled if from map) -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Area Penanaman (Opsional)</label>
+                        <select id="donation-area" class="w-full border-gray-300 rounded-lg p-3 bg-gray-50 border focus:ring-green-500 focus:border-green-500">
+                            <option value="Terserah EcoNusantara">Pilihkan Area Terbaik (Terserah Tim)</option>
+                            <option value="Muara Gembong Mangrove">Muara Gembong Mangrove (Jawa Barat)</option>
+                            <option value="Hutan Lindung Lembang">Hutan Lindung Lembang (Jawa Barat)</option>
+                            <option value="Koridor Orangutan Leuser">Koridor Orangutan Leuser (Sumatera)</option>
+                            <option value="Lahan Kritis Merbabu">Lahan Kritis Merbabu (Jawa Tengah)</option>
+                            <option value="Restorasi Gambut">Restorasi Gambut (Kalimantan)</option>
+                        </select>
+                    </div>
+
+                    <!-- Amount Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah Adopsi Pohon</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+                            <button type="button" class="btn-amount border-2 border-gray-200 rounded-xl py-3 text-center hover:border-green-500 hover:bg-green-50 transition font-bold" onclick="selectAmount(50000, 1, this)">1 Pohon<br><span class="text-xs text-gray-500 font-normal">Rp 50rb</span></button>
+                            <button type="button" class="btn-amount border-2 border-green-500 bg-green-50 rounded-xl py-3 text-center  transition font-bold" onclick="selectAmount(150000, 3, this)">3 Pohon<br><span class="text-xs text-green-600 font-normal">Rp 150rb</span></button>
+                            <button type="button" class="btn-amount border-2 border-gray-200 rounded-xl py-3 text-center hover:border-green-500 hover:bg-green-50 transition font-bold" onclick="selectAmount(500000, 10, this)">10 Pohon<br><span class="text-xs text-gray-500 font-normal">Rp 500rb</span></button>
+                            <button type="button" class="btn-amount border-2 border-gray-200 rounded-xl py-3 text-center hover:border-green-500 hover:bg-green-50 transition font-bold" onclick="selectAmount('custom', null, this)">Lainnya</button>
+                        </div>
+                        <input type="number" id="custom-amount" class="hidden w-full border-gray-300 rounded-lg p-3 border focus:ring-green-500 focus:border-green-500" placeholder="Masukkan jumlah nominal (min. 50000)" oninput="updateCalculations(this.value)">
+                    </div>
+
+                    <!-- Billing Type -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Pembayaran</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="billing-type" value="one-time" checked class="text-green-600 focus:ring-green-500 h-4 w-4">
+                                <span class="ml-2 text-gray-700 font-medium">Sekali Bayar</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="billing-type" value="recurring" class="text-green-600 focus:ring-green-500 h-4 w-4">
+                                <span class="ml-2 text-gray-700 font-medium">Bulanan (Recurring)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Diri (If Guest) -->
+                    <div id="guest-data" class="mb-6 space-y-4">
+                        <h4 class="font-bold text-gray-800 border-b pb-2">Data Donatur</h4>
+                        <div>
+                            <input type="text" id="donor-name" placeholder="Nama Lengkap / Instansi" required class="w-full border-gray-300 rounded-lg p-3 border focus:ring-green-500">
+                        </div>
+                        <div>
+                            <input type="email" id="donor-email" placeholder="Email untuk e-Sertifikat" required class="w-full border-gray-300 rounded-lg p-3 border focus:ring-green-500">
+                        </div>
+                        <label class="flex items-center text-sm text-gray-600">
+                            <input type="checkbox" id="anon-check" class="rounded text-green-600 h-4 w-4 mr-2"> Sembunyikan nama (Anonim)
+                        </label>
+                    </div>
+
+                    <!-- Payment Method Dummy -->
+                    <div class="mb-8">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Metode Pembayaran</label>
+                        <select id="payment-method"required class="w-full border-gray-300 rounded-lg p-3 bg-white border focus:ring-green-500">
+                            <option value="">-- Pilih --</option>
+                            <option value="qris">QRIS (Gopay, OVO, Dana)</option>
+                            <option value="va-bca">BCA Virtual Account</option>
+                            <option value="va-mandiri">Mandiri Virtual Account</option>
+                            <option value="cc">Kartu Kredit / Debit</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center bg-green-50 border-green-200">
+                        <div class="mb-4 md:mb-0 text-center md:text-left">
+                            <div class="text-sm text-green-800">Total Donasi</div>
+                            <div class="text-2xl font-extrabold text-green-900" id="total-display">Rp 150.000</div>
+                            <div class="text-xs font-bold text-green-700 mt-1" id="impact-display">Dampak: 3 Pohon (+63 kg CO2/tahun)</div>
+                        </div>
+                        <button type="submit" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:scale-105">
+                            Lanjutkan Pembayaran
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Success Modal / Overlay (Hidden by default) -->
+            <div id="success-overlay" style="display:none" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+                <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center relative overflow-hidden">
+                    <!-- Confetti background elements CSS -->
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDM0LCAxOTcsIDk0LCAwLjIpIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAydjIwTTIgMTJoMjAiLz48L3N2Zz4=')] opacity-20"></div>
+                    <div class="relative z-10">
+                        <div class="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                            <i data-lucide="check-circle" class="w-10 h-10 text-green-600"></i>
+                        </div>
+                        <h2 class="text-3xl font-extrabold font-serif text-gray-900 mb-2 text-center">Terima Kasih!</h2>
+                        <p class="text-gray-600 mb-6 text-center">Pembayaran berhasil diverifikasi. Bibit pohon Anda segera disemai.</p>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 mb-6 border text-left">
+                            <p class="text-sm text-gray-600">Metode: <span id="s-method" class="font-bold"></span></p>
+                            <p class="text-sm font-bold text-gray-700">Detail Donasi:</p>
+                            <p class="text-sm text-gray-600 mt-1">Donatur: <span id="s-name" class="font-bold text-gray-900"></span></p>
+                            <p class="text-sm text-gray-600">Jumlah: <span id="s-trees" class="font-bold text-green-600"></span> Pohon</p>
+                            <p class="text-sm text-gray-600">Lokasi: <span id="s-loc" class="font-bold"></span></p>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <button onclick="downloadPDF()" class="w-full flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition">
+                                <i data-lucide="download" class="w-5 h-5 mr-2"></i> Download Invoice
+                            </button>
+                            <button onclick="finishFlow()" class="w-full flex justify-center items-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition">
+                                Kembali ke Beranda
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+    <script src="./js/app.js"></script>
+    <script>
+        let currentAmount = 150000;
+        let currentTrees = 3;
+        let p_name = "";
+        let p_loc = "";
+
+        // Check if redirect from map with area Param
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const area = urlParams.get('area');
+            if(area) {
+                const select = document.getElementById('donation-area');
+                for(let i=0; i<select.options.length; i++) {
+                    if(select.options[i].value.includes(area)) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // Auth specific UI
+            const user = getCurrentUser();
+            if(user) {
+                document.getElementById('guest-data').classList.add('hidden');
+                document.getElementById('donor-name').value = user.name;
+                document.getElementById('donor-email').value = user.email;
+            } else {
+                document.getElementById('auth-warning').classList.remove('hidden');
+            }
+        });
+
+        function selectAmount(amount, trees, btnElement) {
+            // reset styles
+            document.querySelectorAll('.btn-amount').forEach(el => {
+                el.classList.remove('border-green-500', 'bg-green-50');
+                el.classList.add('border-gray-200');
+            });
+            btnElement.classList.add('border-green-500', 'bg-green-50');
+            btnElement.classList.remove('border-gray-200');
+
+            const customInput = document.getElementById('custom-amount');
+            if (amount === 'custom') {
+                customInput.classList.remove('hidden');
+                customInput.required = true;
+                updateCalculations(customInput.value || 0);
+            } else {
+                customInput.classList.add('hidden');
+                customInput.required = false;
+                currentAmount = amount;
+                currentTrees = trees;
+                updateUI();
+            }
+        }
+
+        function updateCalculations(val) {
+            const amount = parseInt(val) || 0;
+            currentAmount = amount;
+            currentTrees = Math.floor(amount / 50000);
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('total-display').innerText = "Rp " + currentAmount.toLocaleString('id-ID');
+            document.getElementById('impact-display').innerText = `Dampak: ${currentTrees} Pohon (+${currentTrees * 21} kg CO2/tahun)`;
+        }
+
+        function handleDonation(e) {
+            const payment = document.getElementById("payment-method").value;
+                if (!payment) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Pilih Metode Pembayaran',
+                        text: 'Silakan pilih metode pembayaran terlebih dahulu',
+                        confirmButtonColor: '#166534'
+                    });
+                    return;
+                }
+                    e.preventDefault();
+                    if(currentAmount < 50000) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Nominal Kurang',
+                            text: 'Minimal donasi adalah Rp 50.000 (1 Pohon)',
+                            confirmButtonColor: '#166534'
+                        });
+                        return;
+            }
+
+            const isAnon = document.getElementById('anon-check')?.checked;
+            p_name = isAnon ? "Hamba Allah" : document.getElementById('donor-name').value;
+            p_loc = document.getElementById('donation-area').value;
+            
+            const isRecurring = document.querySelector('input[name="billing-type"]:checked').value === 'recurring';
+            if (isRecurring) {
+                Swal.fire({
+                    title: 'Konfirmasi Donasi Bulanan',
+                    text: "Anda menyetujui pendebetan otomatis setiao bulan untuk keberlanjutan. Lanjutkan membayar bulan pertama?",
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#166534',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Setuju'
+                }).then((result) => {
+                    if (result.isConfirmed) processPayment();
+                });
+            } else {
+                processPayment();
+            }
+        }
+
+        function processPayment() {
+            // Show loading dummy
+            Swal.fire({
+                title: 'Memproses Pembayaran...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Simulate API delay
+            setTimeout(() => {
+                Swal.close();
+                saveDonationData();
+                showSuccessModal();
+            }, 1500);
+        }
+
+        function saveDonationData() {
+            const user = getCurrentUser();
+            if (user) {
+                // Update specific user data
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+                let userIndex = users.findIndex(u => u.email === user.email);
+                
+                if (userIndex !== -1) {
+                    users[userIndex].treesAdopted += currentTrees;
+                    users[userIndex].points += (currentTrees * 10); // 10 pts per tree
+                    
+                    const donationRecord = {
+                        date: new Date().toISOString(),
+                        amount: currentAmount,
+                        trees: currentTrees,
+                        location: p_loc
+                    };
+                    users[userIndex].donations = users[userIndex].donations || [];
+                    users[userIndex].donations.unshift(donationRecord);
+                    
+                    localStorage.setItem('users', JSON.stringify(users));
+                    localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
+                }
+            }
+        }
+
+        function showSuccessModal() {
+            const select = document.getElementById("payment-method");
+            document.getElementById('s-method').innerText = select.options[select.selectedIndex].text;
+            document.getElementById('success-overlay').style.display = 'flex';
+            document.getElementById('s-name').innerText = p_name;
+            document.getElementById('s-trees').innerText = currentTrees;
+            document.getElementById('s-loc').innerText = p_loc;
+            lucide.createIcons();
+        }
+
+        function finishFlow() {
+            const user = getCurrentUser();
+            if(user && user.role !== 'admin') {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+            const totalHarga = currentTrees * 50000;
+            const select = document.getElementById("payment-method");
+            const metodePembayaran = select ? select.options[select.selectedIndex].text : "QRIS";
+            const invoiceNumber = "INV-DONASI-" + Date.now();
+            const tanggal = new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeStyle: 'short' }).format(new Date());
+
+            // ── BACKGROUND ──
+            doc.setFillColor(245, 250, 245);
+            doc.rect(0, 0, 210, 297, 'F');
+
+            // ── HEADER BAR ──
+            doc.setFillColor(22, 101, 52);
+            doc.rect(0, 0, 210, 38, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(22);
+            doc.setTextColor(255, 255, 255);
+            doc.text("EcoNusantara", 20, 18);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(187, 247, 208);
+            doc.text("Platform Donasi Pohon Ramah Lingkungan", 20, 27);
+            doc.text("Setiap donasi membantu menanam pohon nyata", 20, 34);
+            doc.setFontSize(9);
+            doc.setTextColor(255, 255, 255);
+            doc.text("No: " + invoiceNumber, 190, 18, { align: 'right' });
+            doc.text("Tgl: " + tanggal, 190, 26, { align: 'right' });
+
+            // ── TITLE ──
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(22, 101, 52);
+            doc.text("INVOICE DONASI POHON", 20, 52);
+            doc.setDrawColor(22, 101, 52);
+            doc.setLineWidth(0.5);
+            doc.line(20, 55, 190, 55);
+
+            // ── DONOR INFO ──
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(80, 80, 80);
+            doc.text("Donatur:", 20, 64);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(30, 30, 30);
+            doc.text(p_name || "Pelanggan EcoNusantara", 20, 71);
+            doc.text("Lokasi Tanam: " + (p_loc || "Indonesia"), 20, 78);
+
+            // ── TABLE ──
+            const tY = 88;
+            const rH = 10;
+            doc.setFillColor(22, 101, 52);
+            doc.rect(20, tY, 170, rH, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(255, 255, 255);
+            doc.text("Deskripsi", 24, tY + 7);
+            doc.text("Qty", 122, tY + 7, { align: 'center' });
+            doc.text("Harga/Unit", 155, tY + 7, { align: 'right' });
+            doc.text("Subtotal", 188, tY + 7, { align: 'right' });
+
+            // Row
+            doc.setFillColor(255, 255, 255);
+            doc.rect(20, tY + rH, 170, rH, 'F');
+            doc.setDrawColor(220, 220, 220);
+            doc.rect(20, tY + rH, 170, rH);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(30, 30, 30);
+            doc.text("Adopsi Pohon - " + (p_loc || "Area Pilihan Tim"), 24, tY + rH + 7);
+            doc.text(String(currentTrees), 122, tY + rH + 7, { align: 'center' });
+            doc.text("Rp 50.000", 155, tY + rH + 7, { align: 'right' });
+            doc.text("Rp " + totalHarga.toLocaleString('id-ID'), 188, tY + rH + 7, { align: 'right' });
+
+            const tBase = tY + rH * 2 + 12;
+
+            // ── TOTALS ──
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(80, 80, 80);
+            doc.text("Total Donasi:", 140, tBase);
+            doc.setTextColor(22, 101, 52);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Rp " + totalHarga.toLocaleString('id-ID'), 188, tBase, { align: 'right' });
+
+            doc.setDrawColor(22, 101, 52);
+            doc.line(140, tBase + 3, 190, tBase + 3);
+
+            doc.setFontSize(12);
+            doc.text("TOTAL:", 140, tBase + 11);
+            doc.text("Rp " + totalHarga.toLocaleString('id-ID'), 188, tBase + 11, { align: 'right' });
+
+            // ── PAYMENT INFO ──
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(80, 80, 80);
+            doc.text("Metode Pembayaran:", 20, tBase);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(22, 101, 52);
+            doc.text(metodePembayaran, 20, tBase + 8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(80, 80, 80);
+            doc.text("Status:", 20, tBase + 18);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(22, 101, 52);
+            doc.text("LUNAS", 20, tBase + 26);
+
+            // ── LUNAS STAMP ──
+            doc.saveGraphicsState();
+            doc.setGState(new doc.GState({ opacity: 0.12 }));
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(52);
+            doc.setTextColor(22, 101, 52);
+            doc.text("LUNAS", 105, tBase + 32, { align: 'center', angle: 20 });
+            doc.restoreGraphicsState();
+
+            // ── IMPACT NOTE ──
+            const impY = tBase + 45;
+            doc.setFillColor(240, 253, 244);
+            doc.rect(20, impY, 170, 18, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(22, 101, 52);
+            doc.text("Dampak Lingkungan Anda:", 24, impY + 7);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.text(currentTrees + " pohon ditanam  |  +" + (currentTrees * 21) + " kg CO2 diserap/tahun  |  Dirawat 2 tahun oleh petani lokal", 24, impY + 14);
+
+            // ── FOOTER ──
+            doc.setFillColor(22, 101, 52);
+            doc.rect(0, 282, 210, 15, 'F');
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(187, 247, 208);
+            doc.text("Terima kasih telah berkontribusi menjaga lingkungan Indonesia!", 105, 289, { align: 'center' });
+            doc.text("EcoNusantara - Setiap donasi membantu menanam pohon nyata.", 105, 294, { align: 'center' });
+
+            doc.save("Invoice_Donasi_EcoNusantara.pdf");
+
+            Swal.fire({ icon: 'success', title: 'Invoice Berhasil!', text: 'PDF invoice telah didownload.', timer: 2000, showConfirmButton: false });
+        }
+        
+    </script>
+</body>
+</html>

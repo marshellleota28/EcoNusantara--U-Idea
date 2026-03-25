@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Marketplace - Eco Nusantara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- jsPDF library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-scale-in {
+            animation: scaleIn 0.2s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- ORIGINAL NAVBAR - preserved exactly as requested -->
+    <div id="navbar-container"></div>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+        <!-- HEADER + CART ICON -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+            <div>
+                <h1 class="text-4xl font-extrabold font-serif text-gray-900 mb-2">Eco Market</h1>
+                <p class="text-gray-600">Dukung UMKM lokal. 10% pendapatan disumbangkan untuk penanaman pohon.</p>
+            </div>
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <!-- Search -->
+                <div class="relative flex-1 md:w-64">
+                    <input type="text" id="searchInput" placeholder="Cari produk..." 
+                           class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <i data-lucide="search" class="absolute left-4 top-2.5 h-4 w-4 text-gray-400"></i>
+                </div>
+                
+                <!-- LOGO KERANJANG (original) -->
+                <button onclick="showCart()" 
+                        class="relative p-3 bg-white rounded-2xl shadow-sm border border-gray-200 hover:bg-green-50 transition">
+                    <i data-lucide="shopping-cart" class="h-6 w-6 text-gray-700"></i>
+                    <span id="cart-count" 
+                          class="absolute -top-1 -right-1 bg-green-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Products Grid - dynamically rendered -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Products injected via JS -->
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <!-- ==================== MODAL KERANJANG ==================== -->
+    <div id="cart-modal" style="display:none" class="fixed inset-0 bg-black/60 flex items-end md:items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl max-h-[85vh] overflow-hidden animate-scale-in">
+            <div class="px-6 py-5 border-b flex justify-between items-center bg-white sticky top-0">
+                <h2 class="text-2xl font-bold">Keranjang Belanja</h2>
+                <button onclick="closeCart()" class="text-4xl text-gray-400 hover:text-gray-600">×</button>
+            </div>
+            <div id="cart-items" class="p-6 overflow-auto max-h-[55vh]"></div>
+            <div class="px-6 py-5 border-t bg-white">
+                <div class="flex justify-between text-lg">
+                    <span class="font-medium">Total Belanja</span>
+                    <span id="cart-total" class="font-bold text-green-700 text-2xl">Rp 0</span>
+                </div>
+            </div>
+            <div class="p-6 pt-0">
+                <button onclick="proceedToPayment()" 
+                        class="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-3 text-lg">
+                    Lanjut Pembayaran
+                    <i data-lucide="credit-card" class="h-5 w-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL PEMBAYARAN ==================== -->
+    <div id="payment-modal" style="display:none" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden animate-scale-in">
+            <div class="bg-green-600 text-white px-6 py-4 flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Pembayaran</h2>
+                <button onclick="closePayment()" class="text-3xl">×</button>
+            </div>
+            <div class="p-6">
+                <div class="bg-gray-50 rounded-2xl p-5 mb-6">
+                    <div class="text-sm text-gray-500 mb-1">Total Tagihan</div>
+                    <div id="payment-total-display" class="text-4xl font-bold text-green-700">Rp 0</div>
+                </div>
+                <p class="font-medium mb-4">Pilih Metode Pembayaran</p>
+                <div onclick="selectMethod('QRIS')" id="qris-option"
+                     class="flex items-center gap-4 p-4 border-2 border-green-500 rounded-2xl mb-3 cursor-pointer bg-green-50">
+                    <input type="radio" id="qris" name="method" checked class="w-5 h-5 accent-green-500">
+                    <div class="flex-1">
+                        <div class="font-semibold">QRIS (Gopay, OVO, Dana)</div>
+                        <div class="text-xs text-gray-500">Pindai QR atau bayar via aplikasi</div>
+                    </div>
+                </div>
+                <div onclick="selectMethod('BCA')" id="bca-option"
+                     class="flex items-center gap-4 p-4 border border-gray-300 rounded-2xl cursor-pointer">
+                    <input type="radio" id="bca" name="method" class="w-5 h-5 accent-green-500">
+                    <div class="flex-1">
+                        <div class="font-semibold">BCA Virtual Account</div>
+                        <div class="text-xs text-gray-500">No. VA: 88708 1234 5678</div>
+                    </div>
+                </div>
+                <button onclick="processPayment()" 
+                        class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-2xl font-semibold text-lg">
+                    Bayar Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SUKSES -->
+    <div id="success-modal" style="display:none" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-md text-center animate-scale-in">
+            <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                <i data-lucide="check-circle" class="w-8 h-8 text-green-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Pembayaran Berhasil!</h2>
+            <p class="text-gray-600 mb-4">Terima kasih! 10% pendapatan disumbangkan untuk penanaman pohon 🌱</p>
+            
+            <!-- Form untuk data customer (nama & lokasi) -->
+            <div class="text-left mb-5">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Penerima</label>
+                <input type="text" id="customer-name" placeholder="Nama lengkap" 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 mb-3">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi / Alamat</label>
+                <input type="text" id="customer-location" placeholder="Kota, Alamat" 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500">
+            </div>
+            
+            <div class="space-y-3">
+                <button onclick="downloadPDFInvoice()" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
+                    <i data-lucide="file-text" class="h-4 w-4"></i> Download Invoice PDF
+                </button>
+                <button onclick="closeSuccess()" 
+                    class="w-full bg-gray-200 hover:bg-gray-300 py-3 rounded-xl font-semibold">
+                    Kembali ke Market
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/app.js"></script>
+    <script>
+        // ==================== PRODUCT DATABASE ====================
+        const allProducts = [
+            { id: 1, name: "Tote Bag Daur Ulang Kanvas", price: 85000, image: "https://down-id.img.susercontent.com/file/id-11134207-7r98y-lzr3j3ei5bcdb5", seller: "Koperasi Wanita Tani Demak", desc: "Mengurangi penggunaan plastik sekali pakai", isSoldOut: false, badge: "Best Seller" },
+            { id: 2, name: "Set Sedotan Bambu Organik", price: 35000, image: "https://m.indonesian.disposablebamboochopsticks.com/photo/disposablebamboochopsticks/editor/20220422133952_32843.jpg", seller: "Pengrajin Bambu Bandung", desc: "Alternatif ramah lingkungan pengganti plastik", isSoldOut: false, badge: null },
+            { id: 3, name: "Tumbler Kayu Jati Premium", price: 150000, image: "https://pix.toco.id/resize/w:700,h:700,fit:cover,f:webp,q:85/toco/601da8ee-d14b-4cfa-ac61-472675a6b22e-20251002-102607-2.webp?s=78316c1ce3b2086cf38cfa69a89c212bbd3cb2d7bc26cf1d357da3278b707e3c", seller: "EcoJati Jepara", desc: "Reusable & mengurangi sampah botol plastik", isSoldOut: false, badge: null },
+            { id: 4, name: "Pot Tanaman dari Sabut Kelapa", price: 12500, image: "https://images.tokopedia.net/img/cache/700/o3syd0/1997/1/1/de3c3b214b274462be6caf155da46a9a~.jpeg.webp", seller: "Pengrajin Sabut Pangandaran", desc: "Biodegradable & mendukung urban farming", isSoldOut: false, badge: null },
+            { id: 5, name: "Set Alat Makan Kayu Aren", price: 28000, image: "https://dekayu.id/wp-content/uploads/2021/09/71375275-430d-4b75-a3b1-b1c2db34a4bc-1.jpg", seller: "Komunitas Ukir Bali", desc: "Reusable & mengurangi limbah plastik sekali pakai", isSoldOut: false, badge: null },
+            { id: 6, name: "Piring Pelepah Pinang", price: 150000, image: "https://dekranasda.kalbarprov.go.id/uploads/products/kerajinan%20opeh.jpg", seller: "Pengrajin Kalimantan Barat", desc: "100% biodegradable & ramah lingkungan", isSoldOut: false, badge: null },
+            { id: 7, name: "Tas Belanja Jaring Katun", price: 32000, image: "https://demibumi.id/wp-content/uploads/2019/07/Cotton-Net-Bagss-3L.jpg", seller: "Rajut Wanita Mandiri", desc: "Alternatif tas plastik yang tahan lama & stylish", isSoldOut: false, badge: null },
+            { id: 8, name: "Bibit Mangrove Rhizophora", price: 5000, image: "http://kemangi.co.id/wp-content/uploads/2022/06/ExternalLink_Bibit20Mangrove20Jenis20Bakau20di20Pembibitan202-600x600.png", seller: "Komunitas Pesisir Demak", desc: "Cocok untuk rehabilitasi pesisir & cegah abrasi", isSoldOut: false, badge: null },
+            { id: 9, name: "Bibit Pohon Jabon", price: 8000, image: "https://down-id.img.susercontent.com/file/78d5690bf92cc44dba1a2db45570d99f", seller: "Hutan Lestari Nusantara", desc: "Pertumbuhan cepat, cocok untuk reboisasi", isSoldOut: false, badge: null },
+            { id: 10, name: "Bibit Sengon Laut", price: 7500, image: "https://down-id.img.susercontent.com/file/d594dd41b084f6ad495c4f770d56a69d", seller: "Petani Hutan Kalimantan", desc: "Ideal untuk penghijauan & industri kayu", isSoldOut: false, badge: null },
+            { id: 11, name: "Bibit Pohon Jati", price: 15000, image: "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full/catalog-image/105/MTA-179278430/tanaman_bibit_tanaman_kayu_jati_unggul_asli_purworejo_siap_tanam_murah_full01_cwnxwhhp.jpg", seller: "Kebun Rakyat Indonesia", desc: "Cocok untuk agroforestry & hasil buah bernilai tinggi", isSoldOut: false, badge: null },
+            { id: 12, name: "Sabun Mandi Organik Kopi", price: 45000, image: "https://sc04.alicdn.com/kf/H8ab0e62cd991434a9d50100c3b5dfca3B.jpg", seller: "Kopi Luwak Bali", desc: "Eksfoliasi alami dengan ampas kopi", isSoldOut: true, badge: "Habis Terjual" }
+        ];
+
+        let cart = [];
+        let lastTransaction = {
+            items: [],
+            total: 0,
+            method: "QRIS",
+            date: null
+        };
+
+        // ==================== RENDER PRODUCTS ====================
+        function renderProducts() {
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const filtered = allProducts.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) || 
+                product.seller.toLowerCase().includes(searchTerm) ||
+                product.desc.toLowerCase().includes(searchTerm)
+            );
+            
+            const grid = document.getElementById('products-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-16"><i data-lucide="search" class="h-16 w-16 text-gray-300 mx-auto mb-4"></i><p class="text-gray-500 text-lg">Produk tidak ditemukan</p></div>`;
+                lucide.createIcons();
+                return;
+            }
+            
+            filtered.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow overflow-hidden group border border-gray-100';
+                const isSoldOut = product.isSoldOut;
+                
+                productCard.innerHTML = `
+                    <div class="relative h-48 bg-gray-200 overflow-hidden">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 ${isSoldOut ? 'grayscale opacity-80' : ''}" onerror="this.src='https://via.placeholder.com/400x400?text=Eco+Product'">
+                        ${product.badge && !isSoldOut ? `<span class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">${product.badge}</span>` : ''}
+                        ${isSoldOut ? '<span class="absolute inset-0 bg-black/40 flex items-center justify-center text-white font-bold text-lg backdrop-blur-[2px]">Habis Terjual</span>' : ''}
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">${product.name}</h3>
+                        <p class="text-sm text-gray-500 mb-3">Oleh: ${product.seller}</p>
+                        <p class="text-xs text-gray-500 mb-3">${product.desc}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-700 font-extrabold text-xl">Rp ${product.price.toLocaleString('id-ID')}</span>
+                            ${!isSoldOut ? `<button onclick="addToCart('${product.name.replace(/'/g, "\\'")}', ${product.price}, '${product.image}')" class="bg-gray-100 hover:bg-green-100 text-green-700 p-2 rounded-full transition"><i data-lucide="shopping-cart" class="h-5 w-5"></i></button>` : `<button class="bg-gray-100 text-gray-400 p-2 rounded-full cursor-not-allowed"><i data-lucide="shopping-cart" class="h-5 w-5"></i></button>`}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(productCard);
+            });
+            lucide.createIcons();
+        }
+
+        // ==================== CART FUNCTIONS ====================
+        function addToCart(name, price, image) {
+            const existing = cart.find(item => item.name === name);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ name, price, qty: 1, image });
+            }
+            updateCartCount();
+            Swal.fire({ icon: 'success', title: 'Ditambahkan!', text: `${name} berhasil masuk keranjang`, timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((total, item) => total + item.qty, 0);
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) cartCountElement.textContent = count;
+        }
+
+        function showCart() { renderCart(); document.getElementById('cart-modal').style.display = 'flex'; }
+        function closeCart() { document.getElementById('cart-modal').style.display = 'none'; }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 py-8">Keranjang kosong</p>`;
+                document.getElementById('cart-total').textContent = 'Rp 0';
+                return;
+            }
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.qty;
+                total += itemTotal;
+                const div = document.createElement('div');
+                div.className = 'flex gap-4 bg-gray-50 rounded-2xl p-4 mb-3';
+                div.innerHTML = `
+                    <img src="${item.image}" class="w-16 h-16 object-cover rounded-xl" onerror="this.src='https://via.placeholder.com/64x64'">
+                    <div class="flex-1">
+                        <h4 class="font-semibold">${item.name}</h4>
+                        <p class="text-green-700 font-bold">Rp ${item.price.toLocaleString('id-ID')}</p>
+                        <div class="flex items-center gap-4 mt-3">
+                            <button onclick="changeQty(${index}, -1)" class="w-8 h-8 bg-white shadow rounded-full flex items-center justify-center text-lg font-bold hover:bg-gray-100">-</button>
+                            <span class="font-bold text-lg w-8 text-center">${item.qty}</span>
+                            <button onclick="changeQty(${index}, 1)" class="w-8 h-8 bg-white shadow rounded-full flex items-center justify-center text-lg font-bold hover:bg-gray-100">+</button>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${index})" class="text-red-500 text-2xl leading-none hover:text-red-700">×</button>
+                `;
+                container.appendChild(div);
+            });
+            document.getElementById('cart-total').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        function changeQty(index, delta) {
+            if (!cart[index]) return;
+            cart[index].qty += delta;
+            if (cart[index].qty < 1) cart.splice(index, 1);
+            renderCart();
+            updateCartCount();
+        }
+        function removeFromCart(index) { cart.splice(index, 1); renderCart(); updateCartCount(); }
+
+        // ==================== PAYMENT FLOW ====================
+        let selectedMethod = 'QRIS';
+        
+        function proceedToPayment() {
+            if (cart.length === 0) {
+                Swal.fire({ icon: 'warning', title: 'Keranjang Kosong', text: 'Tambahkan produk terlebih dahulu', confirmButtonColor: '#22c55e' });
+                return;
+            }
+            closeCart();
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            document.getElementById('payment-total-display').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('payment-modal').style.display = 'flex';
+            selectMethod(selectedMethod);
+        }
+        
+        function closePayment() { document.getElementById('payment-modal').style.display = 'none'; }
+        
+        function selectMethod(method) {
+            selectedMethod = method;
+            if (method === 'QRIS') {
+                document.getElementById('qris-option').classList.add('border-green-500', 'bg-green-50');
+                document.getElementById('bca-option').classList.remove('border-green-500', 'bg-green-50');
+                document.getElementById('bca-option').classList.add('border-gray-300');
+                document.getElementById('qris').checked = true;
+            } else {
+                document.getElementById('bca-option').classList.add('border-green-500', 'bg-green-50');
+                document.getElementById('qris-option').classList.remove('border-green-500', 'bg-green-50');
+                document.getElementById('qris-option').classList.add('border-gray-300');
+                document.getElementById('bca').checked = true;
+            }
+        }
+        
+        function processPayment() {
+            closePayment();
+            // Save transaction data
+            lastTransaction = {
+                items: [...cart],
+                total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
+                method: selectedMethod === 'QRIS' ? 'QRIS (Gopay, OVO, Dana)' : 'BCA Virtual Account',
+                date: new Date()
+            };
+            
+            // Clear cart
+            cart = [];
+            updateCartCount();
+            renderCart();
+            
+            // Show success modal with customer form
+            document.getElementById('success-modal').style.display = 'flex';
+            // Clear previous input values
+            document.getElementById('customer-name').value = '';
+            document.getElementById('customer-location').value = '';
+            lucide.createIcons();
+        }
+        
+        function closeSuccess() { document.getElementById('success-modal').style.display = 'none'; }
+        
+        // ==================== PDF INVOICE GENERATION ====================
+        async function downloadPDFInvoice() {
+            const customerName = document.getElementById('customer-name').value.trim() || "Pelanggan EcoNusantara";
+            const customerLocation = document.getElementById('customer-location').value.trim() || "Indonesia";
+
+            if (!lastTransaction.items || lastTransaction.items.length === 0) {
+                Swal.fire('Error', 'Tidak ada data transaksi', 'error');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+            const totalHarga = lastTransaction.total;
+            const donasi = Math.floor(totalHarga * 0.1);
+            const metodePembayaran = lastTransaction.method;
+            const invoiceNumber = "ECO-INV-" + Date.now();
+            const tanggal = new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeStyle: 'short' }).format(new Date());
+
+            // ── BACKGROUND ──
+            doc.setFillColor(245, 250, 245);
+            doc.rect(0, 0, 210, 297, 'F');
+
+            // ── HEADER BAR ──
+            doc.setFillColor(22, 101, 52);
+            doc.rect(0, 0, 210, 38, 'F');
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(22);
+            doc.setTextColor(255, 255, 255);
+            doc.text("EcoNusantara", 20, 18);
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(187, 247, 208);
+            doc.text("Marketplace Ramah Lingkungan", 20, 27);
+            doc.text("Setiap belanja membantu menanam pohon", 20, 34);
+
+            // Invoice number top-right
+            doc.setFontSize(9);
+            doc.setTextColor(255, 255, 255);
+            doc.text(`No: ${invoiceNumber}`, 190, 18, { align: 'right' });
+            doc.text(`Tgl: ${tanggal}`, 190, 26, { align: 'right' });
+
+            // ── INVOICE TITLE ──
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(22, 101, 52);
+            doc.text("INVOICE PEMESANAN", 20, 52);
+
+            doc.setDrawColor(22, 101, 52);
+            doc.setLineWidth(0.5);
+            doc.line(20, 55, 190, 55);
+
+            // ── CUSTOMER INFO ──
+            doc.setFontSize(10);
+            doc.setTextColor(80, 80, 80);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Dipesan oleh:", 20, 64);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(30, 30, 30);
+            doc.text(customerName, 20, 71);
+            doc.text("Lokasi: " + customerLocation, 20, 78);
+
+            // ── TABLE HEADER ──
+            const tY = 88;
+            const rH = 10;
+            doc.setFillColor(22, 101, 52);
+            doc.rect(20, tY, 170, rH, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(255, 255, 255);
+            doc.text("Item Produk", 24, tY + 7);
+            doc.text("Qty", 122, tY + 7, { align: 'center' });
+            doc.text("Harga Satuan", 148, tY + 7, { align: 'right' });
+            doc.text("Subtotal", 188, tY + 7, { align: 'right' });
+
+            // ── TABLE ROWS ──
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            let y = tY + rH;
+            lastTransaction.items.forEach((item, i) => {
+                const bg = i % 2 === 0 ? [255,255,255] : [240,253,244];
+                doc.setFillColor(...bg);
+                doc.rect(20, y, 170, rH, 'F');
+                doc.setDrawColor(220, 220, 220);
+                doc.rect(20, y, 170, rH);
+                doc.setTextColor(30, 30, 30);
+                const label = item.name.length > 38 ? item.name.substring(0, 35) + "..." : item.name;
+                doc.text(label, 24, y + 7);
+                doc.text(String(item.qty), 122, y + 7, { align: 'center' });
+                doc.text("Rp " + item.price.toLocaleString('id-ID'), 148, y + 7, { align: 'right' });
+                doc.text("Rp " + (item.price * item.qty).toLocaleString('id-ID'), 188, y + 7, { align: 'right' });
+                y += rH;
+            });
+
+            // ── TOTALS (right-aligned block) ──
+            const tBase = y + 10;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(80, 80, 80);
+            doc.text("Subtotal:", 140, tBase);
+            doc.text("Rp " + totalHarga.toLocaleString('id-ID'), 188, tBase, { align: 'right' });
+
+            doc.text("Donasi Pohon (10%):", 140, tBase + 8);
+            doc.setTextColor(22, 101, 52);
+            doc.text("Rp " + donasi.toLocaleString('id-ID'), 188, tBase + 8, { align: 'right' });
+
+            doc.setDrawColor(22, 101, 52);
+            doc.line(140, tBase + 11, 190, tBase + 11);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(22, 101, 52);
+            doc.text("TOTAL:", 140, tBase + 19);
+            doc.text("Rp " + totalHarga.toLocaleString('id-ID'), 188, tBase + 19, { align: 'right' });
+
+            // ── PAYMENT INFO (left side, same row as totals) ──
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(80, 80, 80);
+            doc.text("Metode Pembayaran:", 20, tBase);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(22, 101, 52);
+            doc.text(metodePembayaran, 20, tBase + 8);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(80, 80, 80);
+            doc.text("Status:", 20, tBase + 18);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(22, 101, 52);
+            doc.text("LUNAS", 20, tBase + 26);
+
+            // ── LUNAS STAMP (positioned below totals, no overlap) ──
+            doc.saveGraphicsState();
+            doc.setGState(new doc.GState({ opacity: 0.15 }));
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(48);
+            doc.setTextColor(22, 101, 52);
+            doc.text("LUNAS", 105, tBase + 30, { align: 'center', angle: 20 });
+            doc.restoreGraphicsState();
+
+            // ── FOOTER ──
+            doc.setFillColor(22, 101, 52);
+            doc.rect(0, 282, 210, 15, 'F');
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(187, 247, 208);
+            doc.text("Terima kasih telah berbelanja di EcoNusantara!", 105, 289, { align: 'center' });
+            doc.text("10% dari setiap pembelian disumbangkan untuk penanaman pohon.", 105, 294, { align: 'center' });
+
+            doc.save(`Invoice_${customerName.replace(/\s+/g, '_')}_EcoNusantara.pdf`);
+
+            Swal.fire({ icon: 'success', title: 'Invoice Berhasil!', text: 'PDF invoice telah didownload.', timer: 2000, showConfirmButton: false });
+        }
+        
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            lucide.createIcons();
+            updateCartCount();
+            
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.addEventListener('input', () => renderProducts());
+        });
+        
+        // Expose globals
+        window.addToCart = addToCart;
+        window.showCart = showCart;
+        window.closeCart = closeCart;
+        window.changeQty = changeQty;
+        window.removeFromCart = removeFromCart;
+        window.proceedToPayment = proceedToPayment;
+        window.closePayment = closePayment;
+        window.selectMethod = selectMethod;
+        window.processPayment = processPayment;
+        window.closeSuccess = closeSuccess;
+        window.downloadPDFInvoice = downloadPDFInvoice;
+    </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - Eco Nusantara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <div id="navbar-container"></div>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-extrabold font-serif text-gray-900 mb-4">Agenda Volunteer</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Turun langsung ke lapangan, tanam bibit dengan tanganmu sendiri, dan rasakan kebersamaan dengan alam.</p>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+            <div class="flex flex-col md:flex-row border-b border-gray-100">
+<!-- Search & Filter -->
+<div class="p-6 md:w-1/3 bg-gray-50 md:border-r border-gray-100">
+    <h3 class="font-bold text-gray-900 mb-4">Filter & Kalender Event</h3>
+    <div class="space-y-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
+            <select id="filter-lokasi" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 p-2 border">
+                <option value="all">Semua Lokasi</option>
+                <option>Jawa Barat</option>
+                <option>Sumatera Utara</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Kegiatan</label>
+            <select id="filter-jenis" class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 p-2 border">
+                <option value="all">Semua Jenis</option>
+                <option>Penanaman Pantai (Mangrove)</option>
+                <option>Reboisasi Hutan</option>
+            </select>
+        </div>
+
+        <div class="pt-4 border-t border-gray-200">
+            <label class="block text-sm font-medium text-gray-700 mb-2 italic text-green-700 flex items-center">
+                <i data-lucide="calendar" class="w-4 h-4 mr-1"></i> Pilih Tanggal Kegiatan
+            </label>
+            <input type="date" id="event-calendar" 
+                class="w-full border-green-200 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 p-3 bg-white border font-bold text-gray-700">
+            <p class="text-[10px] text-gray-500 mt-2">*Klik tanggal untuk menyaring agenda yang tersedia.</p>
+        </div>
+        
+        <button onclick="resetFilters()" class="w-full py-2 text-xs text-gray-500 hover:text-green-600 transition underline">Reset Semua Filter</button>
+    </div>
+</div>
+
+<script>
+document.getElementById('event-calendar').addEventListener('change', function(e) {
+    const selectedDate = e.target.value; // Format: YYYY-MM-DD
+    filterEventsByDate(selectedDate);
+});
+
+function filterEventsByDate(date) {
+    // Logika penyaringan sederhana untuk demo lomba
+    const eventCards = document.querySelectorAll('.space-y-6 > div.flex');
+    let found = false;
+
+    // Mapping dummy: Tanggal 2026-03-25 adalah Mangrove, 2026-04-02 adalah Orangutan
+    eventCards.forEach(card => {
+        const title = card.querySelector('h3').innerText;
+        if ((date === "2026-03-25" && title.includes("Mangrove")) || 
+            (date === "2026-04-02" && title.includes("Orangutan"))) {
+            card.style.display = "flex";
+            found = true;
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    if (!found) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Agenda Kosong',
+            text: 'Tidak ada kegiatan volunteer pada tanggal yang dipilih.',
+            confirmButtonColor: '#166534'
+        });
+    }
+}
+
+function resetFilters() {
+    location.reload();
+}
+
+// Modifikasi fungsi joinEvent yang sudah ada di code anda
+function joinEvent(eventName, date, loc) {
+    if(!isLoggedIn()) {
+        // ... (kode login sweetalert anda tetap sama)
+        return;
+    }
+
+    // SIMPAN DATA KE LOCAL STORAGE UNTUK DASHBOARD
+    const user = getCurrentUser();
+    let users = JSON.parse(localStorage.getItem('users'));
+    let userIndex = users.findIndex(u => u.email === user.email);
+    
+    const newEvent = {
+        name: eventName,
+        date: date, // contoh "2026-03-25"
+        location: loc,
+        status: 'Mendatang'
+    };
+
+    users[userIndex].joinedEvents = users[userIndex].joinedEvents || [];
+    // Cek agar tidak double daftar
+    if(users[userIndex].joinedEvents.find(e => e.name === eventName)) {
+        Swal.fire('Sudah Terdaftar', 'Anda sudah mendaftar di kegiatan ini.', 'info');
+        return;
+    }
+
+    users[userIndex].joinedEvents.push(newEvent);
+    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil Mendaftar!',
+        text: `Agenda disimpan di Dashboard. Kami akan mengingatkanmu sebelum hari-H.`,
+        confirmButtonColor: '#166534'
+    });
+}
+</script>
+                <!-- Event List -->
+                <div class="p-6 md:w-2/3">
+                    <div class="space-y-6">
+                        
+                        <!-- Event Item 1 -->
+                        <div class="flex flex-col sm:flex-row gap-6 bg-white p-4 rounded-xl border hover:border-green-500 hover:shadow-md transition-all">
+                            <div class="sm:w-32 flex-shrink-0 text-center bg-green-50 rounded-lg p-4 flex flex-col justify-center">
+                                <span class="text-green-600 font-bold text-sm uppercase">Mar</span>
+                                <span class="text-4xl font-extrabold text-green-800">25</span>
+                                <span class="text-gray-500 text-xs mt-1">Sabtu, 07:00</span>
+                            </div>
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Aksi Tanam 1.000 Mangrove</h3>
+                                <p class="text-sm text-gray-600 flex items-center mb-1"><i data-lucide="map-pin" class="h-4 w-4 mr-1 text-green-600"></i> Pantai Muara Gembong, Jawa Barat</p>
+                                <p class="text-sm text-gray-600 flex items-center mb-3"><i data-lucide="users" class="h-4 w-4 mr-1 text-green-600"></i> Kuota: 15/50 Relawan</p>
+                                <p class="text-sm text-gray-700 mb-4">Membantu masyarakat pesisir menahan abrasi dengan menanam sabuk mangrove di pesisir utara.</p>
+                                <button onclick="joinEvent('Aksi Tanam 1.000 Mangrove', '2026-03-25', 'Pantai Muara Gembong')" 
+                                    class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition text-sm">
+                                    Daftar Sekarang
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Event Item 2 -->
+                        <div class="flex flex-col sm:flex-row gap-6 bg-white p-4 rounded-xl border hover:border-green-500 hover:shadow-md transition-all">
+                            <div class="sm:w-32 flex-shrink-0 text-center bg-green-50 rounded-lg p-4 flex flex-col justify-center">
+                                <span class="text-green-600 font-bold text-sm uppercase">Apr</span>
+                                <span class="text-4xl font-extrabold text-green-800">02</span>
+                                <span class="text-gray-500 text-xs mt-1">Minggu, 08:30</span>
+                            </div>
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Rehabilitasi Koridor Orangutan</h3>
+                                <p class="text-sm text-gray-600 flex items-center mb-1"><i data-lucide="map-pin" class="h-4 w-4 mr-1 text-green-600"></i> Taman Nasional Gunung Leuser</p>
+                                <p class="text-sm text-gray-600 flex items-center mb-3"><i data-lucide="users" class="h-4 w-4 mr-1 text-green-600"></i> Kuota: 40/40 Relawan (Penuh)</p>
+                                <p class="text-sm text-gray-700 mb-4">Penanaman pohon buah hutan untuk makanan alami primata yang terancam punah.</p>
+                                <button class="bg-gray-300 text-gray-600 font-medium py-2 px-4 rounded-md cursor-not-allowed text-sm" disabled>
+                                    Kuota Penuh
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Event Item 3 -->
+                        <div class="flex flex-col sm:flex-row gap-6 bg-white p-4 rounded-xl border hover:border-green-500 hover:shadow-md transition-all">
+                            <div class="sm:w-32 flex-shrink-0 text-center bg-green-50 rounded-lg p-4 flex flex-col justify-center">
+                                <span class="text-green-600 font-bold text-sm uppercase">Apr</span>
+                                <span class="text-4xl font-extrabold text-green-800">14</span>
+                                <span class="text-gray-500 text-xs mt-1">Selasa, 10.00</span>
+                            </div>
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Edukasi Tani & Tanam Pohon</h3>
+                                <p class="text-sm text-gray-600 flex items-center mb-1">
+                                    <i data-lucide="map-pin" class="h-4 w-4 mr-1 text-green-600"></i> Lembang, Jawa Barat
+                                </p>
+                                <p class="text-sm text-gray-600 flex items-center mb-3">
+                                    <i data-lucide="users" class="h-4 w-4 mr-1 text-green-600"></i> Kuota: 20/50 Relawan
+                                </p>
+                                <p class="text-sm text-gray-700 mb-4">Program mengajar anak sekolah pentingnya menjaga pohon di area pegunungan.</p>
+                                
+                                <button onclick="joinEvent('Edukasi Tani & Tanam Pohon', '2026-04-14', 'Lembang, Jawa Barat')" 
+                                    class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition text-sm">
+                                    Daftar Sekarang
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+    <script src="./js/app.js"></script>
+</body>
+</html>

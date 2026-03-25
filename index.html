@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco Nusantara - Tanam Pohon Hari Ini, Selamatkan Masa Depan Indonesia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+    <!-- CountUp.js for stats -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.0.0/countUp.min.js"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <div id="navbar-container"></div>
+
+    <main class="flex-grow">
+     <!-- Hero Section with Background Slider (Auto + Manual) -->
+  <section class="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+    
+    <div class="absolute inset-0 z-0" id="hero-images">
+        <div class="hero-slide absolute inset-0 w-full h-full opacity-0 transition-opacity duration-1000 active">
+            <img src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=2000" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-emerald-900/90 to-green-800/60 mix-blend-multiply"></div>
+        </div>
+        <div class="hero-slide absolute inset-0 w-full h-full opacity-0 transition-opacity duration-1000">
+            <img src="https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=2000" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-emerald-800/60 mix-blend-multiply"></div>
+        </div>
+        <div class="hero-slide absolute inset-0 w-full h-full opacity-0 transition-opacity duration-1000">
+            <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2000" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-yellow-900/70 to-green-900/60 mix-blend-multiply"></div>
+        </div>
+        <div class="hero-slide absolute inset-0 w-full h-full opacity-0 transition-opacity duration-1000">
+            <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2000" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-emerald-800/80 to-teal-900/70 mix-blend-multiply"></div>
+        </div>
+    </div>
+
+    <div class="relative z-20 text-center px-4 max-w-5xl mx-auto -mt-20 md:mt-0">
+        <span id="hero-tag" class="inline-block py-1 px-3 rounded-full bg-green-500/20 text-green-100 backdrop-blur-sm border border-green-400/30 text-sm font-semibold mb-6 transition-all duration-500">
+            #GerakanHijauIndonesia
+        </span>
+        
+        <h1 id="hero-title" class="text-4xl md:text-6xl lg:text-7xl font-bold font-serif text-white mb-4 md:mb-6 leading-tight drop-shadow-lg transition-all duration-500 -translate-y-6 md:translate-y-0">
+            Tanam Pohon Hari Ini,<br /><span class="text-green-300">Selamatkan Masa Depan.</span>
+        </h1>
+        
+        <p id="hero-desc" class="text-lg md:text-2xl text-green-50 mb-10 max-w-[85%] md:max-w-3xl mx-auto drop-shadow-md font-light transition-all duration-500">
+            Platform reboisasi komunitas terbesar di Indonesia. Setiap donasi Anda berdampak nyata untuk iklim, kemandirian ekonomi masyarakat, dan masa depan bumi.
+        </p>
+
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="donasi.html" class="flex items-center justify-center bg-green-600 hover:bg-green-500 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg transition-all transform hover:scale-105">
+                <i data-lucide="heart" class="mr-2 h-5 w-5"></i> Donasi Sekarang
+            </a>
+            <a href="peta.html" class="flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold py-4 px-8 rounded-full text-lg transition-all">
+                <i data-lucide="map" class="mr-2 h-5 w-5"></i> Lihat Peta Penanaman
+            </a>
+        </div>
+    </div>
+
+<button id="hero-prev" class="slider-btn absolute left-2 md:left-8 z-30 rounded-full p-2 md:p-3 text-white top-[46%] md:top-1/2">
+    <i data-lucide="chevron-left" class="w-8 h-8"></i>
+</button>
+
+<button id="hero-next" class="slider-btn absolute right-2 md:right-8 z-30 rounded-full p-2 md:p-3 text-white top-[46%] md:top-1/2">
+    <i data-lucide="chevron-right" class="w-8 h-8"></i>
+</button>
+
+    <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-gray-50 to-transparent z-10"></div>
+</section>
+        <!-- Impact Counter Bar -->
+        <section class="relative z-20 -mt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-2">
+            <div class="glass-dark rounded-2xl p-8 shadow-2xl flex flex-col md:flex-row justify-between items-center text-white border-white/20">
+                <div class="text-center md:text-left mb-6 md:mb-0">
+                    <h3 class="font-serif text-xl text-green-300 mb-1">Total Dampak Kita</h3>
+                    <p class="text-sm text-gray-400">Diperbarui secara real-time</p>
+                </div>
+                <div class="flex flex-col md:flex-row gap-8 md:gap-16">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold font-serif mb-2" id="count-trees">0</div>
+                        <div class="text-sm font-medium text-gray-300 flex items-center justify-center"><i data-lucide="tree-pine" class="w-4 h-4 mr-1 text-green-400"></i> Pohon Ditanam</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold font-serif mb-2" id="count-co2">0</div>
+                        <div class="text-sm font-medium text-gray-300 flex items-center justify-center"><i data-lucide="cloud" class="w-4 h-4 mr-1 text-blue-400"></i> Ton CO2 Terserap</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold font-serif mb-2" id="count-farmers">0</div>
+                        <div class="text-sm font-medium text-gray-300 flex items-center justify-center"><i data-lucide="users" class="w-4 h-4 mr-1 text-yellow-400"></i> Petani Terbantu</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Programs (Upcoming Events) -->
+        <section class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-extrabold text-gray-900 font-serif mb-4">Program & Event Mendatang</h2>
+                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">Bergabunglah sebagai relawan di lapangan dan jadilah bagian dari perubahan secara fisik.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Event 1 -->
+                    <div class="bg-gray-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
+                        <div class="relative h-48">
+                            <img src="https://luwukpost.id/wp-content/uploads/2025/10/IMG_20251028_3694.jpg" alt="Penanaman Mangrove" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur text-green-800 text-xs font-bold px-3 py-1 rounded-full">
+                                25 Mar 2026
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center text-sm text-gray-500 mb-2">
+                                <i data-lucide="map-pin" class="h-4 w-4 mr-1 text-green-600"></i> Muara Gembong, Jawa Barat
+                            </div>
+                            <h3 class="text-xl font-bold font-serif text-gray-900 mb-2">Aksi Tanam 1.000 Mangrove</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">Bantu kami menahan abrasi pantai dengan menanam mangrove bersama warga pesisir.</p>
+                            <a href="events.html" class="flex items-center text-green-600 font-bold hover:text-green-800">
+                                Daftar via WA <i data-lucide="arrow-right" class="ml-1 h-4 w-4"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Event 2 -->
+                    <div class="bg-gray-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
+                        <div class="relative h-48">
+                            <img src="https://assets.isu.pub/document-structure/230122041106-e9c32e2dd92843457b8475e5cac601d4/v1/08c40b5075b2ae7620f8225b3e6009c5.jpeg" alt="Rehabilitasi Hutan" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur text-green-800 text-xs font-bold px-3 py-1 rounded-full">
+                                02 Apr 2026
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center text-sm text-gray-500 mb-2">
+                                <i data-lucide="map-pin" class="h-4 w-4 mr-1 text-green-600"></i> Gunung Leuser, Sumatera
+                            </div>
+                            <h3 class="text-xl font-bold font-serif text-gray-900 mb-2">Rehabilitasi Koridor Orangutan</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">Penanaman pohon buah hutan untuk makanan alami primata yang terancam punah.</p>
+                            <a href="events.html" class="flex items-center text-green-600 font-bold hover:text-green-800">
+                                Daftar via WA <i data-lucide="arrow-right" class="ml-1 h-4 w-4"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Event 3 -->
+                    <div class="bg-gray-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
+                        <div class="relative h-48">
+                            <img src="https://www.kehutanan.go.id/s/uploads/medium_Fvh_Y_IMG_20250322_WA_0054_5f0c731847.jpg" alt="Edukasi Sekolah" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur text-green-800 text-xs font-bold px-3 py-1 rounded-full">
+                                14 Apr 2026
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center text-sm text-gray-500 mb-2">
+                                <i data-lucide="map-pin" class="h-4 w-4 mr-1 text-green-600"></i> Lembang, Jawa Barat
+                            </div>
+                            <h3 class="text-xl font-bold font-serif text-gray-900 mb-2">Edukasi Tani & Tanam Pohon</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">Program mengajar anak sekolah pentingnya menjaga pohon di area pegunungan.</p>
+                            <a href="events.html" class="flex items-center text-green-600 font-bold hover:text-green-800">
+                                Daftar via WA <i data-lucide="arrow-right" class="ml-1 h-4 w-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 text-center">
+                    <a href="komunitas.html" class="inline-flex items-center justify-center px-6 py-3 border border-green-600 text-green-700 font-bold rounded-full hover:bg-green-50 transition-colors">
+                        Lihat Semua Kegiatan & Komunitas
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonial Carousel -->
+          <section class="py-20 bg-green-900 text-white overflow-hidden relative">
+            <div class="absolute inset-0 z-0 opacity-10">
+                <svg class="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 1463 360"><path class="text-green-500 text-opacity-40" fill="currentColor" d="M-82.673 72l1761.849 472.086-134.327 501.315-1761.85-472.086z"/><path class="text-green-700 text-opacity-40" fill="currentColor" d="M-217.088 544.086L1544.761 72l134.327 501.316-1761.849 472.086z"/></svg>
+            </div>
+            
+            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-extrabold font-serif mb-4">Kata Mereka yang Peduli</h2>
+                    <p class="text-green-200">Bergabunglah dengan ribuan orang lainnya yang telah membuat perubahan nyata.</p>
+                </div>
+
+                <div class="swiper testimonial-swiper">
+                    <div class="swiper-wrapper pb-12">
+                        <!-- Slide 1 -->
+                        <div class="swiper-slide">
+                            <div class="glass-dark p-8 rounded-2xl text-center h-full border border-white/10 flex flex-col items-center">
+                                <img class="w-20 h-20 rounded-full mb-6 border-2 border-green-400 object-cover shadow-lg" 
+                                    src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
+                                
+                                <p class="text-lg italic mb-6 leading-relaxed flex-grow text-gray-100">
+                                    "Saya bangga bisa memantau pohon yang saya sumbangkan melalui fitur peta. Eco Nusantara memberikan transparansi luar biasa!"
+                                </p>
+                                
+                                <div class="mt-auto">
+                                    <h4 class="font-bold text-white text-base">Aulia Rahma</h4>
+                                    <p class="text-green-400 text-sm mb-3">Donatur - Jakarta</p>
+                                    
+                                    <div class="flex justify-center gap-1 text-yellow-400">
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="swiper-slide">
+                            <div class="glass-dark p-8 rounded-2xl text-center h-full border border-white/10 flex flex-col items-center">
+                                <img class="w-20 h-20 rounded-full mb-6 border-2 border-green-400 object-cover shadow-lg" 
+                                    src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                                
+                                <p class="text-lg italic mb-6 leading-relaxed flex-grow text-gray-100">
+                                    "Program volunteer-nya luar biasa seru. Saya bertemu banyak teman baru di komunitas WA yang sama-sama peduli bumi."
+                                </p>
+                                
+                                <div class="mt-auto">
+                                    <h4 class="font-bold text-white text-base">Bimasakti</h4>
+                                    <p class="text-green-400 text-sm mb-3">Relawan - Bandung</p>
+                                    
+                                    <div class="flex justify-center gap-1 text-yellow-400">
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="swiper-slide">
+                            <div class="glass-dark p-8 rounded-2xl text-center h-full border border-white/10 flex flex-col items-center">
+                                <img class="w-20 h-20 rounded-full mb-6 border-2 border-green-400 object-cover shadow-lg" 
+                                    src="https://randomuser.me/api/portraits/women/68.jpg" alt="User">
+                                
+                                <p class="text-lg italic mb-6 leading-relaxed flex-grow text-gray-100">
+                                    "Dashboard personal sangat memotivasi. Melihat jumlah karbon yang terserap dari pohon yang saya adopsi membuat saya ingin terus donasi."
+                                </p>
+                                
+                                <div class="mt-auto">
+                                    <h4 class="font-bold text-white text-base">Siti Nurhaliza</h4>
+                                    <p class="text-green-400 text-sm mb-3">Eco Warrior - Surabaya</p>
+                                    
+                                    <div class="flex justify-center gap-1 text-yellow-400">
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                        <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="./js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script>
+        // Init Swiper
+        const swiper = new Swiper('.testimonial-swiper', {
+            slidesPerView: 1,
+            spaceBetween: 30,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 1,
+                },
+                768: {
+                    slidesPerView: 2,
+                },
+                1024: {
+                    slidesPerView: 3,
+                },
+            }
+        });
+
+        // Init animate count up slowly
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const options = { duration: 3, separator: ',' };
+                // Using modern dynamic import or window mapping strategy for pure HTML
+                if (window.countUp) {
+                    let trees = new window.countUp.CountUp('count-trees', 124536, options);
+                    let co2 = new window.countUp.CountUp('count-co2', 2615, options);
+                    let farmers = new window.countUp.CountUp('count-farmers', 842, options);
+                    
+                    if (!trees.error) trees.start();
+                    if (!co2.error) co2.start();
+                    if (!farmers.error) farmers.start();
+                } else {
+                    document.getElementById('count-trees').innerText = "124,536";
+                    document.getElementById('count-co2').innerText = "2,615";
+                    document.getElementById('count-farmers').innerText = "842";
+                }
+            }, 500); // slight delay to allow rendering
+        });
+    </script>
+</body>
+</html>

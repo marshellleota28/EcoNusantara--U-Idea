@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabung Mitra UMKM - Eco Nusantara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    <div id="navbar-container"></div>
+
+    <main class="flex-grow flex items-center justify-center py-20 px-4">
+        <div class="max-w-2xl w-full glass p-8 rounded-3xl shadow-xl relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="store" class="h-8 w-8 text-green-600"></i>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 font-serif">Jadi Mitra Eco Market</h2>
+                    <p class="text-sm text-gray-600 mt-2">Daftarkan produk UMKM ramah lingkunganmu untuk kami kelola di Eco Market.</p>
+                </div>
+
+                <form id="umkm-form" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Usaha/UMKM</label>
+                            <input type="text" id="umkm-name" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none" placeholder="Cth: Pengrajin Bambu Lembang">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">WhatsApp Pengelola</label>
+                            <input type="tel" id="umkm-phone" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none" placeholder="0812...">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+                        <input type="text" id="prod-name" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none" placeholder="Cth: Sedotan Bambu Set">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Harga (Rp)</label>
+                            <input type="number" id="prod-price" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none" placeholder="50000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Link Foto Produk (URL)</label>
+                            <input type="url" id="prod-img" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none" placeholder="https://...">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Manfaat Lingkungan (Deskripsi Singkat)</label>
+                        <textarea id="prod-desc" rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none" placeholder="Jelaskan mengapa produk ini ramah lingkungan..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform hover:scale-[1.02]">
+                        Kirim Pengajuan Produk
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+    <script src="./js/app.js"></script>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Cek apakah user sudah login atau belum
+        protectRoute(); 
+
+        const user = getCurrentUser();
+        if(user) {
+            // Otomatis isi data jika user sudah punya profil
+            document.getElementById('umkm-name').value = user.name || "";
+        }
+    });
+
+    document.getElementById('umkm-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Cek login sekali lagi sebelum submit (keamanan tambahan)
+        if(!isLoggedIn()) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const submission = {
+            id: Date.now(),
+            userEmail: getCurrentUser().email, // Catat email pengirim
+            umkm: document.getElementById('umkm-name').value,
+            phone: document.getElementById('umkm-phone').value,
+            product: document.getElementById('prod-name').value,
+            price: document.getElementById('prod-price').value,
+            image: document.getElementById('prod-img').value,
+            desc: document.getElementById('prod-desc').value,
+            status: 'pending'
+        };
+
+        let queue = JSON.parse(localStorage.getItem('umkm_queue') || '[]');
+        queue.push(submission);
+        localStorage.setItem('umkm_queue', JSON.stringify(queue));
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil Terkirim!',
+            text: 'Admin akan mengkurasi produkmu sebelum ditampilkan di Eco Market.',
+            confirmButtonColor: '#166534'
+        }).then(() => location.reload());
+    });
+</script>
+</body>
+</html>

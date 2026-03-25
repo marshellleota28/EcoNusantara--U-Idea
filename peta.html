@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Penanaman - Eco Nusantara</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <div id="navbar-container"></div>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col lg:flex-row gap-8">
+        
+        <!-- Sidebar Filter controls -->
+        <aside class="w-full lg:w-1/4 bg-white p-6 rounded-2xl shadow-lg h-fit border border-gray-100">
+            <h2 class="text-2xl font-bold font-serif text-green-900 mb-6 flex items-center">
+                <i data-lucide="filter" class="w-5 h-5 mr-2"></i> Filter Area
+            </h2>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Provinsi</label>
+                <select id="provinsi-filter" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 p-2.5 bg-gray-50 border">
+                    <option value="all">Semua Provinsi</option>
+                    <option value="Jawa Barat">Jawa Barat</option>
+                    <option value="Jawa Tengah">Jawa Tengah</option>
+                    <option value="Kalimantan">Kalimantan</option>
+                    <option value="Sumatera">Sumatera</option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Pohon</label>
+                <div class="space-y-2">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="jenis-filter rounded text-green-600 focus:ring-green-500 h-4 w-4" value="Mangrove" checked>
+                        <span class="ml-2 text-sm text-gray-700">Mangrove (Pesisir)</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="jenis-filter rounded text-green-600 focus:ring-green-500 h-4 w-4" value="Mahoni" checked>
+                        <span class="ml-2 text-sm text-gray-700">Mahoni (Pegunungan)</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="jenis-filter rounded text-green-600 focus:ring-green-500 h-4 w-4" value="Beringin" checked>
+                        <span class="ml-2 text-sm text-gray-700">Beringin (Mata Air)</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="jenis-filter rounded text-green-600 focus:ring-green-500 h-4 w-4" value="Buah" checked>
+                        <span class="ml-2 text-sm text-gray-700">Pohon Buah (Ekonomi)</span>
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="applyFilter()" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition">
+                Terapkan Filter
+            </button>
+            
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h3 class="font-bold text-gray-900 mb-2 text-sm">Status Lahan Kritis</h3>
+                <div class="flex items-center mb-1"><span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span> Kritis (Segera Butuh Donasi)</div>
+                <div class="flex items-center mb-1"><span class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></span> Proses Pemulihan</div>
+                <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span> Hijau (Sukses)</div>
+            </div>
+        </aside>
+
+        <!-- Map Container -->
+        <div class="w-full lg:w-3/4 flex flex-col">
+            <div id="map" class="shadow-xl"></div>
+            <div class="bg-green-50 rounded-xl p-4 mt-4 flex items-start text-sm text-green-800 border border-green-200">
+                <i data-lucide="info" class="w-5 h-5 flex-shrink-0 mr-2 mt-0.5"></i>
+                <p>Klik marker pada peta untuk melihat detail survival rate, dokumentasi before/after, dan melakukan adopsi pohon spesifik di area tersebut.</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+    <script src="./js/app.js"></script>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+   <script>
+    // Dummy Data Locations (sama, tapi tambah fallback image)
+    const plantingLocations = [
+        { 
+            id: 1, 
+            name: "Muara Gembong Mangrove", 
+            provinsi: "Jawa Barat", 
+            lat: -6.0461, 
+            lng: 107.0305, 
+            jenis: "Mangrove", 
+            status: "Pemulihan", 
+            color: "yellow", 
+            survival: "88%",
+            planted: "10,000",
+            img: "https://cdns.klimg.com/merdeka.com/i/w/news/2022/07/26/1456730/content_images/670x335/20220726182445-1-ilustrasi-hutan-bakau-001-andre-kurniawan.jpg"
+        },
+        { 
+            id: 2, 
+            name: "Hutan Lindung Lembang", 
+            provinsi: "Jawa Barat", 
+            lat: -6.8148, 
+            lng: 107.6186, 
+            jenis: "Mahoni", 
+            status: "Hijau", 
+            color: "green", 
+            survival: "95%",
+            planted: "5,000",
+            img: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fawsimages.detik.net.id%2Fcommunity%2Fmedia%2Fvisual%2F2023%2F06%2F17%2Fpenampakan-hijaunya-hutan-lindung-jayagiri-di-lembang-2_169.jpeg%3Fw%3D700%26q%3D90&f=1&nofb=1&ipt=f8fb3546a24f58dd2171bcd8eedaaf65fcb5cff163f3799af270f02bfeee4c7a"
+        },
+        { 
+            id: 3, 
+            name: "Koridor Orangutan Leuser", 
+            provinsi: "Sumatera", 
+            lat: 3.5936, 
+            lng: 97.4878, 
+            jenis: "Buah", 
+            status: "Pemulihan", 
+            color: "yellow", 
+            survival: "82%",
+            planted: "15,000",
+            img: "https://indomgb.s3.amazonaws.com/wp-content/uploads/2025/05/21231849/Leuser2.jpeg"
+        },
+        { 
+            id: 4, 
+            name: "Lahan Kritis Merbabu", 
+            provinsi: "Jawa Tengah", 
+            lat: -7.4552, 
+            lng: 110.4390, 
+            jenis: "Beringin", 
+            status: "Kritis", 
+            color: "red", 
+            survival: "N/A",
+            planted: "500",
+            img: "https://images.bisnis.com/photos/2018/11/19/130376/lahankritis191118-1.jpg"
+        },
+        { 
+            id: 5, 
+            name: "Restorasi Gambut", 
+            provinsi: "Kalimantan", 
+            lat: -1.2384, 
+            lng: 113.3364, 
+            jenis: "Mahoni", 
+            status: "Kritis", 
+            color: "red", 
+            survival: "40%",
+            planted: "2,000",
+            img: "https://pantaugambut.id/images/original/articles/3_Temuan_Penting_-_Cerita_32.jpg"
+        }
+    ];
+
+    let map;
+    let markersGroup;
+
+    // Init map
+    window.addEventListener('load', () => {
+        map = L.map('map').setView([-2.5489, 118.0149], 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        markersGroup = L.layerGroup().addTo(map);
+        renderMarkers(plantingLocations);
+    });
+
+    function getMarkerColor(color) {
+        const colors = {
+            'red':    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            'yellow': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+            'green':  'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png'
+        };
+        return L.icon({
+            iconUrl: colors[color],
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+    }
+
+  function renderMarkers(data) {
+    markersGroup.clearLayers();
+
+    data.forEach(loc => {
+        const marker = L.marker([loc.lat, loc.lng], {icon: getMarkerColor(loc.color)});
+
+        // Popup content yang lebih clean & robust
+        const popupContent = `
+            <div class="w-72 p-1">
+                <div class="relative w-full h-40 bg-gray-200 rounded-t-lg mb-3 overflow-hidden">
+                    <img src="${loc.img}" 
+                         alt="${loc.name}"
+                         class="w-full h-full object-cover"
+                         loading="eager"
+                         onerror="this.src='https://via.placeholder.com/400x160/cccccc/000000?text=Gambar+Gagal'; this.alt='Gambar tidak tersedia';">
+                    <div class="absolute inset-0 bg-black/30 flex items-center justify-center text-white text-sm font-medium pointer-events-none loading-text">
+                    </div>
+                </div>
+                <div class="font-bold text-lg text-green-900">${loc.name}</div>
+                <div class="text-xs text-gray-500 mb-3">${loc.provinsi} • ${loc.jenis}</div>
+                
+                <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+                    <div class="bg-gray-50 p-2 rounded text-center">
+                        <span class="block text-xs text-gray-500">Survival</span>
+                        <span class="font-bold text-green-600">${loc.survival}</span>
+                    </div>
+                    <div class="bg-gray-50 p-2 rounded text-center">
+                        <span class="block text-xs text-gray-500">Ditanam</span>
+                        <span class="font-bold text-blue-600">${loc.planted}</span>
+                    </div>
+                </div>
+                
+                <button onclick="window.location.href='donasi.html?area=${encodeURIComponent(loc.name)}'" 
+                        class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 text-base shadow-md">
+                    Adopsi Pohon di Sini
+                </button>
+            </div>
+        `;
+
+        marker.bindPopup(popupContent, { maxWidth: 300 });
+
+        // Auto-hide loading text setelah gambar load (simpel & aman)
+        marker.on('popupopen', function(e) {
+            const popupEl = e.popup.getElement();
+            const img = popupEl.querySelector('img');
+            const loading = popupEl.querySelector('.loading-text');
+
+            const hideLoading = () => {
+                if (loading) loading.style.display = 'none';
+                e.popup.update();  // Force resize popup
+            };
+
+            if (img.complete) {
+                hideLoading();
+            } else {
+                img.addEventListener('load', hideLoading, { once: true });
+                img.addEventListener('error', hideLoading, { once: true });
+            }
+        });
+
+        markersGroup.addLayer(marker);
+    });
+}
+
+    function applyFilter() {
+        const prov = document.getElementById('provinsi-filter').value;
+        const jenisNodes = document.querySelectorAll('.jenis-filter:checked');
+        const selectedJenis = Array.from(jenisNodes).map(n => n.value);
+
+        const filteredData = plantingLocations.filter(loc => {
+            const matchProv = prov === 'all' || loc.provinsi === prov;
+            const matchJenis = selectedJenis.includes(loc.jenis);
+            return matchProv && matchJenis;
+        });
+
+        renderMarkers(filteredData);
+        
+        if (filteredData.length === 0) {
+            Swal.fire({
+                icon: 'info',
+                title: '0 Hasil',
+                text: 'Tidak ada area penanaman dengan filter tersebut.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    }
+</script>
+</body>
+</html>

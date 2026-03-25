@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Eco Nusantara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .stat-card { transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-2px); }
+        .sidebar-toggle { display: none; }
+        @media (max-width: 768px) {
+            .sidebar-toggle { display: block; }
+            aside { position: fixed; left: 0; top: 64px; width: 256px; height: calc(100vh - 64px); z-index: 40; transition: transform 0.3s ease; transform: translateX(-100%); }
+            aside.active { transform: translateX(0); }
+            main { width: 100% !important; }
+        }
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .chart-container { position: relative; height: 280px; }
+
+        /* ── Admin Navbar ── */
+        .admin-navbar {
+            background: linear-gradient(135deg, #052e16 0%, #14532d 50%, #166534 100%);
+            box-shadow: 0 4px 24px rgba(5, 46, 22, 0.5);
+        }
+        .navbar-inner {
+            position: relative;
+        }
+        .navbar-accent-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4ade80, #86efac, #4ade80, transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        .navbar-logo-wrap {
+            width: 34px;
+            height: 34px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .navbar-logo-wrap:hover {
+            background: rgba(255,255,255,0.15);
+            transform: rotate(-5deg) scale(1.05);
+        }
+        .navbar-icon-btn {
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .navbar-icon-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.15);
+        }
+        .navbar-status-dot {
+            width: 7px;
+            height: 7px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3); }
+            50% { box-shadow: 0 0 0 5px rgba(74, 222, 128, 0.1); }
+        }
+        .navbar-user-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 999px;
+            padding: 4px 12px 4px 4px;
+            cursor: default;
+            transition: all 0.2s ease;
+        }
+        .navbar-user-chip:hover {
+            background: rgba(255,255,255,0.14);
+            border-color: rgba(255,255,255,0.25);
+        }
+        .navbar-avatar {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #4ade80, #16a34a);
+            box-shadow: 0 0 0 2px rgba(74,222,128,0.35);
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.05em;
+        }
+        .navbar-user-role {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #86efac;
+            line-height: 1;
+        }
+        .navbar-logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: 1.5px solid rgba(239, 68, 68, 0.45);
+            color: #fca5a5;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 999px;
+            transition: all 0.22s ease;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+        .navbar-logout-btn:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+        }
+        .navbar-lang-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .navbar-lang-btn:hover {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.35);
+        }
+        #admin-mobile-drawer {
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+        }
+        #admin-mobile-drawer.open { transform: translateX(0); }
+        #admin-drawer-overlay { display: none; }
+        #admin-drawer-overlay.open { display: block; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col min-h-screen pt-16">
+
+    <nav class="fixed top-0 left-0 right-0 z-50 admin-navbar">
+        <div class="navbar-inner">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="flex justify-between h-16 items-center gap-3">
+
+                    <!-- LEFT: Brand -->
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        <a href="index.html" class="flex items-center gap-2 group">
+                            <div class="navbar-logo-wrap">
+                                <i data-lucide="shield-check" class="w-5 h-5 text-green-300 group-hover:text-white transition-colors duration-200"></i>
+                            </div>
+                            <div class="flex flex-col leading-tight">
+                                <span class="font-bold text-white text-base tracking-tight">EcoNusantara</span>
+                                <span class="text-green-300 text-[10px] font-semibold uppercase tracking-widest hidden sm:block" id="admin-panel-label">Admin Panel</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- CENTER: Status (desktop only) -->
+                    <div class="hidden md:flex items-center gap-2 flex-1 justify-center">
+                        <span class="navbar-status-dot"></span>
+                        <span class="text-green-200 text-xs font-medium" id="admin-status-label">Sistem Aktif</span>
+                    </div>
+
+                    <!-- RIGHT: desktop controls -->
+                    <div class="hidden md:flex items-center gap-2 flex-shrink-0">
+                        <!-- Lang toggle -->
+                        <button onclick="adminToggleLang()" class="navbar-lang-btn" id="admin-lang-btn" aria-label="Toggle Language">ID</button>
+
+                        <div class="w-px h-5 bg-white/20"></div>
+
+                        <!-- User chip -->
+                        <div class="navbar-user-chip">
+                            <div class="navbar-avatar">
+                                <i data-lucide="user-round" class="w-4 h-4 text-white"></i>
+                            </div>
+                            <div class="flex flex-col leading-tight gap-0.5">
+                                <span id="admin-username" class="text-white text-xs font-semibold whitespace-nowrap leading-none"></span>
+                                <span class="navbar-user-role" id="admin-role-label">Administrator</span>
+                            </div>
+                        </div>
+
+                        <div class="w-px h-5 bg-white/20"></div>
+
+                        <!-- Logout -->
+                        <button onclick="adminLogout()" class="navbar-logout-btn" id="admin-logout-btn">
+                            <i data-lucide="log-out" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                            <span id="admin-logout-label">Keluar</span>
+                        </button>
+                    </div>
+
+                    <!-- RIGHT: mobile controls (lang + hamburger drawer) -->
+                    <div class="flex md:hidden items-center gap-2 flex-shrink-0">
+                        <button onclick="adminToggleLang()" class="navbar-lang-btn" id="admin-lang-btn-mobile" aria-label="Toggle Language">ID</button>
+                        <button onclick="adminOpenDrawer()" class="navbar-icon-btn" aria-label="Menu">
+                            <i data-lucide="menu" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="navbar-accent-line"></div>
+
+        <!-- Mobile drawer overlay -->
+        <div id="admin-drawer-overlay" class="fixed inset-0 bg-black/40 z-40" onclick="adminCloseDrawer()"></div>
+
+        <!-- Mobile slide-in drawer -->
+        <div id="admin-mobile-drawer" class="fixed top-0 right-0 h-full w-72 bg-white z-50 flex flex-col shadow-2xl">
+            <!-- Drawer header -->
+            <div class="flex items-center justify-between px-4 py-4 bg-green-800">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white/15 rounded-lg flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-bold leading-none">EcoNusantara</p>
+                        <p class="text-green-300 text-[10px] font-semibold uppercase tracking-widest" id="drawer-panel-label">Admin Panel</p>
+                    </div>
+                </div>
+                <button onclick="adminCloseDrawer()" class="navbar-icon-btn">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- User info -->
+            <div class="px-4 py-4 border-b border-gray-100 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-700 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="user-round" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <p id="drawer-username" class="text-sm font-bold text-gray-900"></p>
+                    <p class="text-xs text-green-600 font-semibold" id="drawer-role-label">Administrator</p>
+                </div>
+            </div>
+
+            <!-- Nav links -->
+            <div class="flex-1 overflow-y-auto py-3 px-3 space-y-1">
+                <button onclick="switchSection('dashboard');adminCloseDrawer()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span id="drawer-link-dashboard">Dashboard</span>
+                </button>
+                <button onclick="switchSection('users');adminCloseDrawer()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    <span id="drawer-link-users">Manajemen User</span>
+                </button>
+                <button onclick="switchSection('volunteers');adminCloseDrawer()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span id="drawer-link-volunteers">Monitoring Relawan</span>
+                </button>
+                <button onclick="switchSection('umkm');adminCloseDrawer()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors">
+                    <i data-lucide="store" class="w-4 h-4"></i>
+                    <span>Persetujuan UMKM</span>
+                    <span id="drawer-umkm-badge" class="ml-auto hidden text-[10px] font-bold bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full"></span>
+                </button>
+                <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors">
+                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                    <span id="drawer-link-public">Lihat Web Publik</span>
+                </a>
+            </div>
+
+            <!-- Lang + Logout -->
+            <div class="px-4 py-4 border-t border-gray-100 space-y-2">
+                <button onclick="adminToggleLang()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border border-green-200 text-green-700 hover:bg-green-50 transition-colors">
+                    <i data-lucide="languages" class="w-4 h-4"></i>
+                    <span id="drawer-lang-label">Ganti Bahasa (EN)</span>
+                </button>
+                <button onclick="adminLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-red-500 border border-red-200 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span id="drawer-logout-label">Keluar</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex flex-grow w-full relative">
+        <aside id="sidebar" class="w-64 bg-white shadow-lg border-r border-gray-200 md:block md:shadow-none md:border-r-0 transition-all duration-300">
+            <div class="p-6 space-y-8">
+                <div>
+                    <h3 class="text-xs font-bold uppercase text-gray-400 tracking-widest mb-3" id="sidebar-menu-label">Menu Utama</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a onclick="switchSection('dashboard')" class="cursor-pointer flex items-center p-3 text-green-700 rounded-lg font-bold transition hover:bg-green-100 duration-200 section-link" data-section="dashboard">
+                                <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
+                                <span id="sidebar-link-dashboard">Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a onclick="switchSection('users')" class="cursor-pointer flex items-center p-3 text-green-700 rounded-lg font-bold transition hover:bg-green-100 duration-200 section-link" data-section="users">
+                                <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+                                <span id="sidebar-link-users">Manajemen User</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a onclick="switchSection('volunteers')" class="cursor-pointer flex items-center p-3 text-green-700 bg-green-50 rounded-lg font-bold transition hover:bg-green-100 duration-200 section-link" data-section="volunteers">
+                                <i data-lucide="calendar" class="w-5 h-5 mr-3"></i>
+                                <span id="sidebar-link-volunteers">Monitoring Relawan</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a onclick="switchSection('umkm')" class="cursor-pointer flex items-center p-3 text-green-700 rounded-lg font-bold transition hover:bg-green-100 duration-200 section-link" data-section="umkm">
+                                <i data-lucide="store" class="w-5 h-5 mr-3"></i>
+                                <span>Persetujuan UMKM</span>
+                                <span id="sidebar-umkm-badge" class="ml-auto hidden text-[10px] font-bold bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pt-4 border-t border-gray-200">
+                    <a href="index.html" class="flex items-center p-3 text-blue-600 hover:bg-blue-50 rounded-lg transition font-medium duration-200 hover:text-blue-700">
+                        <i data-lucide="external-link" class="w-5 h-5 mr-3"></i>
+                        <span id="sidebar-link-public">Lihat Web Publik</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-grow p-4 md:p-8 w-full max-w-7xl mx-auto mr-auto">
+            <!-- Dashboard Section -->
+            <div id="section-dashboard" class="section-content">
+                <div class="mb-8">
+                    <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-2 tracking-tight">Dashboard Monitoring</h1>
+                    <p class="text-gray-500 text-sm">Kelola dan pantau semua aktivitas platform EcoNusantara</p>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                    <div class="stat-card bg-white rounded-2xl shadow-sm hover:shadow-md p-6 border-t-4 border-green-500 relative overflow-hidden group">
+                        <div class="absolute -right-8 -top-8 w-20 h-20 bg-green-50 rounded-full opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        <div class="text-gray-500 text-xs mb-3 uppercase font-bold tracking-widest">Total User Aktif</div>
+                        <div class="text-4xl font-bold text-gray-900 mb-2" id="ad-total-users">0</div>
+                        <div class="flex items-center text-xs font-semibold text-green-600"><i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> +12% dari bulan lalu</div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-2xl shadow-sm hover:shadow-md p-6 border-t-4 border-orange-500 relative overflow-hidden group">
+                        <div class="absolute -right-8 -top-8 w-20 h-20 bg-orange-50 rounded-full opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        <div class="text-gray-500 text-xs mb-3 uppercase font-bold tracking-widest">Relawan Terdaftar</div>
+                        <div class="text-4xl font-bold text-gray-900 mb-2" id="ad-total-volunteers">0</div>
+                        <div class="text-xs font-semibold text-orange-600">Aktif di agenda</div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-2xl shadow-sm hover:shadow-md p-6 border-t-4 border-yellow-500 relative overflow-hidden group">
+                        <div class="absolute -right-8 -top-8 w-20 h-20 bg-yellow-50 rounded-full opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        <div class="text-gray-500 text-xs mb-3 uppercase font-bold tracking-widest">Total Donasi (Rp)</div>
+                        <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-2 leading-tight" id="ad-total-donations">0</div>
+                        <div class="text-xs font-semibold text-green-600">Target Q1: 85%</div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-2xl shadow-sm hover:shadow-md p-6 border-t-4 border-purple-500 relative overflow-hidden group">
+                        <div class="absolute -right-8 -top-8 w-20 h-20 bg-purple-50 rounded-full opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        <div class="text-gray-500 text-xs mb-3 uppercase font-bold tracking-widest">Newsletter Subs</div>
+                        <div class="text-4xl font-bold text-gray-900 mb-2" id="ad-total-subs">0</div>
+                        <div class="text-xs font-semibold text-purple-600">Subscribers aktif</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-8 border border-gray-100">
+                    <div class="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center bg-gradient-to-r from-gray-50 to-white gap-4">
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-lg">Monitoring Relawan & Akun</h3>
+                            <p class="text-xs text-gray-400 mt-2 uppercase tracking-tighter">Data bersumber dari Local Storage Platform</p>
+                        </div>
+                        <button onclick="clearDummyData()" class="text-xs bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all duration-200 w-full md:w-auto">
+                            <i data-lucide="trash-2" class="inline w-4 h-4 mr-1"></i> Reset Database
+                        </button>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest">Nama / Email</th>
+                                    <th class="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest hidden sm:table-cell">Role</th>
+                                    <th class="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest">Agenda Diikuti</th>
+                                    <th class="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest hidden md:table-cell">Total Donasi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-table-body" class="bg-white divide-y divide-gray-100">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
+                    <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition duration-300">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-bold text-gray-800 text-lg flex items-center">
+                                <i data-lucide="bar-chart-3" class="w-5 h-5 mr-2 text-green-600"></i> Tren Donasi Tahunan
+                            </h3>
+                            <span class="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full font-semibold">Rp</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="donationChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition duration-300">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-bold text-gray-800 text-lg flex items-center">
+                                <i data-lucide="pie-chart" class="w-5 h-5 mr-2 text-green-600"></i> Distribusi Pohon Ditanam
+                            </h3>
+                            <span class="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-full font-semibold">Pohon</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="areaChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management Section -->
+            <div id="section-users" class="section-content hidden">
+
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Dashboard / Manajemen User</p>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Manajemen User</h1>
+                        <p class="text-gray-500 text-sm mt-1">Kelola dan pantau semua pengguna platform EcoNusantara</p>
+                    </div>
+                    <button onclick="openAddUserModal()" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all duration-200 text-sm whitespace-nowrap">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i> Tambah User
+                    </button>
+                </div>
+
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-11 h-11 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="users" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Total User</p>
+                            <p class="text-2xl font-bold text-gray-900" id="um-total">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-11 h-11 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="shield" class="w-5 h-5 text-purple-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Admin</p>
+                            <p class="text-2xl font-bold text-gray-900" id="um-admins">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-11 h-11 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="calendar-check" class="w-5 h-5 text-orange-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Relawan Aktif</p>
+                            <p class="text-2xl font-bold text-gray-900" id="um-volunteers">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                    <!-- Toolbar -->
+                    <div class="p-4 md:p-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-grow">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                                <input type="text" id="userSearch" placeholder="Cari nama atau email..." 
+                                    class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm bg-white">
+                            </div>
+                            <select id="roleFilter" class="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm bg-white min-w-[130px]">
+                                <option value="">Semua Role</option>
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-scroll">
+                        <table class="w-full divide-y divide-gray-100">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 md:px-6 py-3.5 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">User</th>
+                                    <th class="px-4 md:px-6 py-3.5 text-left text-xs font-bold text-gray-500 uppercase tracking-widest hidden sm:table-cell">Email</th>
+                                    <th class="px-4 md:px-6 py-3.5 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Role</th>
+                                    <th class="px-4 md:px-6 py-3.5 text-left text-xs font-bold text-gray-500 uppercase tracking-widest hidden md:table-cell">Donasi</th>
+                                    <th class="px-4 md:px-6 py-3.5 text-left text-xs font-bold text-gray-500 uppercase tracking-widest hidden lg:table-cell">Agenda</th>
+                                    <th class="px-4 md:px-6 py-3.5 text-center text-xs font-bold text-gray-500 uppercase tracking-widest">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body" class="bg-white divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="px-4 md:px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50">
+                        <span class="text-xs text-gray-500" id="um-pagination-info">Menampilkan 0 data</span>
+                        <div class="flex items-center gap-1" id="um-pagination-btns"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Add / Edit User -->
+            <div id="modal-user" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeUserModal()"></div>
+                <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md z-10 overflow-hidden">
+                    <div class="bg-gradient-to-r from-green-700 to-green-600 px-6 py-4 flex items-center justify-between">
+                        <h3 class="text-white font-bold text-base" id="modal-user-title">Tambah User</h3>
+                        <button onclick="closeUserModal()" class="text-white/70 hover:text-white transition">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <form id="form-user" onsubmit="saveUser(event)" class="p-6 space-y-4">
+                        <input type="hidden" id="edit-user-email-original">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
+                            <input type="text" id="input-user-name" required placeholder="Nama lengkap"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-1.5">Email</label>
+                            <input type="email" id="input-user-email" required placeholder="email@example.com"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div id="input-password-wrap">
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-1.5">Password</label>
+                            <input type="password" id="input-user-password" placeholder="Min. 6 karakter"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-widest mb-1.5">Role</label>
+                            <select id="input-user-role" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button type="button" onclick="closeUserModal()" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 transition">Batal</button>
+                            <button type="submit" class="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal: Detail User -->
+            <div id="modal-user-detail" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeDetailModal()"></div>
+                <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md z-10 overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-700 to-blue-600 px-6 py-4 flex items-center justify-between">
+                        <h3 class="text-white font-bold text-base">Detail User</h3>
+                        <button onclick="closeDetailModal()" class="text-white/70 hover:text-white transition">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div id="modal-detail-body" class="p-6 space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Volunteer Monitoring Section -->
+            <div id="section-volunteers" class="section-content hidden">
+                <div class="mb-8">
+                    <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-2 tracking-tight">Monitoring Relawan</h1>
+                    <p class="text-gray-500 text-sm">Pantau dan kelola aktivitas relawan di berbagai agenda</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
+                    <div class="stat-card bg-white rounded-2xl shadow-sm hover:shadow-md p-6 border-t-4 border-blue-500 relative overflow-hidden group">
+                        <div class="absolute -right-8 -top-8 w-20 h-20 bg-blue-50 rounded-full opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        <div class="text-gray-500 text-xs mb-3 uppercase font-bold tracking-widest">Total Relawan</div>
+                        <div class="text-4xl font-bold text-gray-900 mb-2" id="vol-total">0</div>
+                        <div class="text-xs font-semibold text-blue-600">Relawan aktif</div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-2xl shadow-sm hover:shadow-md p-6 border-t-4 border-indigo-500 relative overflow-hidden group">
+                        <div class="absolute -right-8 -top-8 w-20 h-20 bg-indigo-50 rounded-full opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        <div class="text-gray-500 text-xs mb-3 uppercase font-bold tracking-widest">Total Jam Kerja</div>
+                        <div class="text-4xl font-bold text-gray-900 mb-2" id="vol-hours">0</div>
+                        <div class="text-xs font-semibold text-indigo-600">Jam volunteer</div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-2xl shadow-sm hover:shadow-md p-6 border-t-4 border-cyan-500 relative overflow-hidden group">
+                        <div class="absolute -right-8 -top-8 w-20 h-20 bg-cyan-50 rounded-full opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        <div class="text-gray-500 text-xs mb-3 uppercase font-bold tracking-widest">Agenda Aktif</div>
+                        <div class="text-4xl font-bold text-gray-900 mb-2" id="vol-events">0</div>
+                        <div class="text-xs font-semibold text-cyan-600">Agenda dijalankan</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                    <div class="p-4 md:p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                        <input type="text" id="volunteerSearch" placeholder="Cari relawan atau agenda..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm">
+                    </div>
+                    <div class="table-scroll">
+                        <table class="w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest">Relawan</th>
+                                    <th class="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest hidden sm:table-cell">Email</th>
+                                    <th class="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest">Agenda</th>
+                                    <th class="px-4 md:px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-widest hidden md:table-cell">Total Kegiatan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="volunteers-table-body" class="bg-white divide-y divide-gray-100">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- UMKM Approval Section -->
+            <div id="section-umkm" class="section-content hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Dashboard / Persetujuan UMKM</p>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Persetujuan Mitra UMKM</h1>
+                        <p class="text-gray-500 text-sm mt-1">Kurasi dan setujui produk dari calon mitra Eco Market</p>
+                    </div>
+                </div>
+
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-11 h-11 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Menunggu</p>
+                            <p class="text-2xl font-bold text-gray-900" id="umkm-stat-pending">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-11 h-11 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Disetujui</p>
+                            <p class="text-2xl font-bold text-gray-900" id="umkm-stat-approved">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="x-circle" class="w-5 h-5 text-red-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Ditolak</p>
+                            <p class="text-2xl font-bold text-gray-900" id="umkm-stat-rejected">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs + Filter -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+                        <div class="flex gap-1 bg-gray-100 p-1 rounded-xl">
+                            <button onclick="switchUMKMTab('pending')" id="tab-pending"
+                                class="umkm-tab px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-gray-800 shadow-sm">
+                                Menunggu
+                            </button>
+                            <button onclick="switchUMKMTab('approved')" id="tab-approved"
+                                class="umkm-tab px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-700">
+                                Disetujui
+                            </button>
+                            <button onclick="switchUMKMTab('rejected')" id="tab-rejected"
+                                class="umkm-tab px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-700">
+                                Ditolak
+                            </button>
+                        </div>
+                        <div class="relative w-full sm:w-64">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                            <input type="text" id="umkm-search" placeholder="Cari produk atau UMKM..."
+                                class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Cards Grid -->
+                    <div id="umkm-cards-container" class="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 min-h-[200px]">
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            
+        </main>
+    </div>
+
+    <script src="./js/app.js"></script>
+    <script>
+        let allUsers = [];
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function updateUMKMBadge() {
+    const queue = JSON.parse(localStorage.getItem('umkm_queue') || '[]');
+    const pendingCount = queue.filter(i => i.status === 'pending').length;
+    ['sidebar-umkm-badge', 'drawer-umkm-badge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (pendingCount > 0) {
+            el.textContent = pendingCount;
+            el.classList.remove('hidden');
+        } else {
+            el.classList.add('hidden');
+        }
+    });
+}
+
+        function renderUMKMQueue() {
+    const queue = JSON.parse(localStorage.getItem('umkm_queue') || '[]');
+    const pending = queue.filter(i => i.status === 'pending');
+    const approved = queue.filter(i => i.status === 'approved');
+    const rejected = queue.filter(i => i.status === 'rejected');
+
+    document.getElementById('umkm-stat-pending').textContent = pending.length;
+    document.getElementById('umkm-stat-approved').textContent = approved.length;
+    document.getElementById('umkm-stat-rejected').textContent = rejected.length;
+    updateUMKMBadge();
+
+    // Render current active tab
+    const activeTab = document.querySelector('.umkm-tab.bg-white')?.id?.replace('tab-', '') || 'pending';
+    renderUMKMCards(activeTab);
+
+    // Search listener
+    const searchEl = document.getElementById('umkm-search');
+    if (searchEl) {
+        searchEl.replaceWith(searchEl.cloneNode(true));
+        document.getElementById('umkm-search').addEventListener('input', () => {
+            const tab = document.querySelector('.umkm-tab.bg-white')?.id?.replace('tab-', '') || 'pending';
+            renderUMKMCards(tab);
+        });
+    }
+    lucide.createIcons();
+}
+
+function switchUMKMTab(tab) {
+    document.querySelectorAll('.umkm-tab').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-gray-800', 'shadow-sm');
+        btn.classList.add('text-gray-500');
+    });
+    const active = document.getElementById('tab-' + tab);
+    if (active) {
+        active.classList.add('bg-white', 'text-gray-800', 'shadow-sm');
+        active.classList.remove('text-gray-500');
+    }
+    renderUMKMCards(tab);
+}
+
+function renderUMKMCards(tab) {
+    const queue = JSON.parse(localStorage.getItem('umkm_queue') || '[]');
+    const searchVal = (document.getElementById('umkm-search')?.value || '').toLowerCase();
+    const container = document.getElementById('umkm-cards-container');
+
+    let items = queue.map((item, originalIndex) => ({ ...item, originalIndex }))
+        .filter(item => item.status === tab)
+        .filter(item => {
+            if (!searchVal) return true;
+            return (item.product || '').toLowerCase().includes(searchVal) ||
+                   (item.umkm || '').toLowerCase().includes(searchVal) ||
+                   (item.userEmail || '').toLowerCase().includes(searchVal);
+        });
+
+    if (items.length === 0) {
+        const msgs = { pending: 'Tidak ada pengajuan baru', approved: 'Belum ada produk disetujui', rejected: 'Belum ada produk ditolak' };
+        container.innerHTML = `<div class="col-span-3 py-16 text-center text-gray-400">
+            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-30"></i>
+            <p class="text-sm">${msgs[tab] || 'Tidak ada data'}</p>
+        </div>`;
+        lucide.createIcons();
+        return;
+    }
+
+    container.innerHTML = items.map(item => {
+        const statusBadge = {
+            pending: `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-700"><i data-lucide="clock" class="w-3 h-3"></i> Menunggu</span>`,
+            approved: `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700"><i data-lucide="check-circle" class="w-3 h-3"></i> Disetujui</span>`,
+            rejected: `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-600"><i data-lucide="x-circle" class="w-3 h-3"></i> Ditolak</span>`
+        }[item.status] || '';
+
+        const actionBtns = item.status === 'pending' ? `
+            <div class="flex gap-2 mt-3">
+                <button onclick="approveProduct(${item.originalIndex})"
+                    class="flex-1 flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 rounded-xl transition">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i> Setujui
+                </button>
+                <button onclick="rejectProduct(${item.originalIndex})"
+                    class="flex-1 flex items-center justify-center gap-1.5 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white text-xs font-bold py-2 rounded-xl border border-red-200 hover:border-red-600 transition">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i> Tolak
+                </button>
+            </div>` : `
+            <div class="flex gap-2 mt-3">
+                <button onclick="resetProductStatus(${item.originalIndex})"
+                    class="flex-1 flex items-center justify-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold py-2 rounded-xl transition">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset ke Pending
+                </button>
+                 <button onclick="deleteProductStatus(${item.originalIndex})"
+                    class="flex-1 flex items-center justify-center gap-1.5 bg-red-100 hover:bg-red-200 text-red-600 text-xs font-bold py-2 rounded-xl transition">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i> Hapus Permanen
+                </button>
+            </div>`;
+
+        return `
+        <div class="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden flex flex-col">
+                <div class="relative">
+                    <img src="${item.image ? item.image : 'https://placehold.co/400x160'}" 
+                        alt="${item.product}"
+                        class="w-full h-40 object-cover"
+                        onerror="this.onerror=null; this.src='https://placehold.co/400x160/e5e7eb/9ca3af?text=No+Image';">
+                    
+                    <div class="absolute top-2 right-2">${statusBadge}</div>
+                </div>
+            <div class="p-4 flex flex-col flex-grow">
+                <div class="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                        <p class="font-bold text-gray-900 text-sm leading-tight">${item.product}</p>
+                        <p class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                            <i data-lucide="store" class="w-3 h-3"></i> ${item.umkm}
+                        </p>
+                    </div>
+                    <p class="text-green-700 font-bold text-sm whitespace-nowrap">Rp ${parseInt(item.price || 0).toLocaleString('id-ID')}</p>
+                </div>
+
+                <p class="text-xs text-gray-500 line-clamp-2 mb-3 flex-grow">${item.desc || '-'}</p>
+
+                <div class="space-y-1.5 text-xs text-gray-500 border-t border-gray-100 pt-3">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="phone" class="w-3.5 h-3.5 text-gray-400 flex-shrink-0"></i>
+                        <span>${item.phone || '-'}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="mail" class="w-3.5 h-3.5 text-gray-400 flex-shrink-0"></i>
+                        <span class="truncate">${item.userEmail || '-'}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-gray-400 flex-shrink-0"></i>
+                        <span>${item.id ? new Date(item.id).toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' }) : '-'}</span>
+                    </div>
+                </div>
+
+                ${actionBtns}
+            </div>
+        </div>`;
+    }).join('');
+
+    lucide.createIcons();
+}
+
+function approveProduct(index) {
+    let queue = JSON.parse(localStorage.getItem('umkm_queue') || '[]');
+    if (!queue[index]) return;
+    Swal.fire({
+        icon: 'question',
+        title: 'Setujui Produk?',
+        html: `Produk <strong>${queue[index].product}</strong> dari <strong>${queue[index].umkm}</strong> akan dipublikasikan ke Eco Market.`,
+        showCancelButton: true,
+        confirmButtonColor: '#16a34a',
+        cancelButtonText: 'Batal',
+        confirmButtonText: 'Ya, Setujui'
+    }).then(result => {
+        if (result.isConfirmed) {
+            queue[index].status = 'approved';
+            queue[index].approvedAt = Date.now();
+            localStorage.setItem('umkm_queue', JSON.stringify(queue));
+            renderUMKMQueue();
+            Swal.fire({ icon: 'success', title: 'Disetujui!', text: `Produk ${queue[index].product} telah dipublikasikan.`, timer: 1800, showConfirmButton: false });
+        }
+    });
+}
+
+function rejectProduct(index) {
+    let queue = JSON.parse(localStorage.getItem('umkm_queue') || '[]');
+    if (!queue[index]) return;
+    Swal.fire({
+        icon: 'warning',
+        title: 'Tolak Produk?',
+        html: `Produk <strong>${queue[index].product}</strong> akan ditolak.`,
+        input: 'textarea',
+        inputPlaceholder: 'Alasan penolakan (opsional)...',
+        inputAttributes: { rows: 3 },
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonText: 'Batal',
+        confirmButtonText: 'Ya, Tolak'
+    }).then(result => {
+        if (result.isConfirmed) {
+            queue[index].status = 'rejected';
+            queue[index].rejectedAt = Date.now();
+            queue[index].rejectReason = result.value || '';
+            localStorage.setItem('umkm_queue', JSON.stringify(queue));
+            renderUMKMQueue();
+            Swal.fire({ icon: 'info', title: 'Ditolak', timer: 1500, showConfirmButton: false });
+        }
+    });
+}
+
+function resetProductStatus(index) {
+    let queue = JSON.parse(localStorage.getItem('umkm_queue') || '[]');
+    if (!queue[index]) return;
+    queue[index].status = 'pending';
+    delete queue[index].approvedAt;
+    delete queue[index].rejectedAt;
+    delete queue[index].rejectReason;
+    localStorage.setItem('umkm_queue', JSON.stringify(queue));
+    renderUMKMQueue();
+    switchUMKMTab('pending');
+}
+function deleteProductStatus(index) {
+    Swal.fire({
+        title: 'Yakin?',
+        text: "Data akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#166534',
+        cancelButtonColor: '#d33'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let queue = JSON.parse(localStorage.getItem('umkm_queue') || '[]');
+            queue.splice(index, 1);
+            localStorage.setItem('umkm_queue', JSON.stringify(queue));
+            renderUMKMQueue();
+            switchUMKMTab('rejected');
+            Swal.fire({
+                icon: 'success',
+                title: 'Terhapus!',
+                text: 'Produk berhasil dihapus.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    });
+}
+
+
+
+
+
+      function switchSection(sectionName) {
+    // 1. Sembunyikan semua section
+    document.querySelectorAll('.section-content').forEach(section => {
+        section.classList.add('hidden');
+    });
+
+    // 2. Tampilkan section yang dipilih
+    const targetSection = document.getElementById(`section-${sectionName}`);
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
+    }
+
+    // 3. Jalankan fungsi render spesifik
+    if (sectionName === 'users') renderUserManagement();
+    if (sectionName === 'volunteers') renderVolunteerMonitoring();
+    if (sectionName === 'umkm') renderUMKMQueue(); 
+
+    // 4. Update tampilan menu aktif di sidebar
+    document.querySelectorAll('.section-link').forEach(link => {
+        link.classList.remove('text-green-700', 'bg-green-50');
+        link.classList.add('text-gray-600');
+    });
+    
+    const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
+    if (activeLink) {
+        activeLink.classList.add('text-green-700', 'bg-green-50');
+        activeLink.classList.remove('text-gray-600');
+    }
+
+    // 5. Tutup sidebar mobile jika terbuka
+    if(document.getElementById('sidebar')) {
+        document.getElementById('sidebar').classList.remove('active');
+    }
+    window.scrollTo(0, 0);
+}
+
+        // Close sidebar when clicking on a link
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebarLinks = document.querySelectorAll('#sidebar a:not([href])');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    document.getElementById('sidebar').classList.remove('active');
+                });
+            });
+
+            // Close sidebar when clicking outside
+            document.addEventListener('click', (e) => {
+                const sidebar = document.getElementById('sidebar');
+                const toggle = document.querySelector('.sidebar-toggle');
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // ── User Management State ──
+        const UM_PAGE_SIZE = 8;
+        let umCurrentPage = 1;
+        let umFiltered = [];
+
+        function renderUserManagement() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            allUsers = users;
+
+            // Stat cards
+            document.getElementById('um-total').textContent = users.length;
+            document.getElementById('um-admins').textContent = users.filter(u => u.role === 'admin').length;
+            document.getElementById('um-volunteers').textContent = users.filter(u => (u.joinedEvents || []).length > 0).length;
+
+            umFiltered = users;
+            umCurrentPage = 1;
+            renderUsersTable(umFiltered);
+
+            // Listeners (guard against double-binding)
+            const searchEl = document.getElementById('userSearch');
+            const roleEl = document.getElementById('roleFilter');
+            searchEl.replaceWith(searchEl.cloneNode(true));
+            roleEl.replaceWith(roleEl.cloneNode(true));
+            document.getElementById('userSearch').addEventListener('input', filterUsers);
+            document.getElementById('roleFilter').addEventListener('change', filterUsers);
+        }
+
+        function filterUsers() {
+            const searchVal = document.getElementById('userSearch').value.toLowerCase();
+            const roleVal = document.getElementById('roleFilter').value;
+            umFiltered = allUsers.filter(u => {
+                const matchSearch = !searchVal || (u.name || '').toLowerCase().includes(searchVal) || (u.email || '').toLowerCase().includes(searchVal);
+                const matchRole = !roleVal || u.role === roleVal;
+                return matchSearch && matchRole;
+            });
+            umCurrentPage = 1;
+            renderUsersTable(umFiltered);
+        }
+
+        function renderUsersTable(users) {
+            const tbody = document.getElementById('users-table-body');
+            const total = users.length;
+            const totalPages = Math.max(1, Math.ceil(total / UM_PAGE_SIZE));
+            if (umCurrentPage > totalPages) umCurrentPage = totalPages;
+
+            const start = (umCurrentPage - 1) * UM_PAGE_SIZE;
+            const pageUsers = users.slice(start, start + UM_PAGE_SIZE);
+
+            // Info text
+            document.getElementById('um-pagination-info').textContent =
+                total === 0 ? 'Tidak ada data' : `Menampilkan ${start + 1}–${Math.min(start + UM_PAGE_SIZE, total)} dari ${total} user`;
+
+            if (total === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center">
+                    <div class="flex flex-col items-center gap-2 text-gray-400">
+                        <i data-lucide="users" class="w-8 h-8 opacity-40"></i>
+                        <span class="text-sm">Tidak ada data user</span>
+                    </div></td></tr>`;
+                document.getElementById('um-pagination-btns').innerHTML = '';
+                lucide.createIcons();
+                return;
+            }
+
+            tbody.innerHTML = pageUsers.map(u => {
+                const name = u.name || 'Eco Warrior';
+                const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                const roleBadge = u.role === 'admin'
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-full bg-purple-100 text-purple-700 uppercase"><i data-lucide="shield" class="w-3 h-3"></i>Admin</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700 uppercase"><i data-lucide="user" class="w-3 h-3"></i>User</span>`;
+                const totalDonasi = (u.donations || []).reduce((s, d) => s + (d.amount || 0), 0);
+                const agendaCount = (u.joinedEvents || []).length;
+                const emailSafe = encodeURIComponent(u.email);
+
+                return `<tr class="hover:bg-gray-50/70 transition-colors duration-150 group">
+                    <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">${initials}</div>
+                            <div>
+                                <div class="text-sm font-semibold text-gray-900">${name}</div>
+                                <div class="text-xs text-gray-400 sm:hidden">${u.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-4 md:px-6 py-3.5 whitespace-nowrap hidden sm:table-cell text-xs text-gray-500">${u.email}</td>
+                    <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">${roleBadge}</td>
+                    <td class="px-4 md:px-6 py-3.5 whitespace-nowrap hidden md:table-cell text-xs font-semibold text-gray-700">
+                        ${totalDonasi > 0 ? 'Rp ' + totalDonasi.toLocaleString('id-ID') : '<span class="text-gray-300">—</span>'}
+                    </td>
+                    <td class="px-4 md:px-6 py-3.5 whitespace-nowrap hidden lg:table-cell">
+                        ${agendaCount > 0
+                            ? `<span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-orange-100 text-orange-600">${agendaCount} Agenda</span>`
+                            : `<span class="text-gray-300 text-xs">—</span>`}
+                    </td>
+                    <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
+                        <div class="flex items-center justify-center gap-1">
+                            <button onclick="viewUserDetail('${emailSafe}')" title="Detail"
+                                class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-150">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="openEditUserModal('${emailSafe}')" title="Edit"
+                                class="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-150">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="deleteUser('${emailSafe}')" title="Hapus"
+                                class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-150">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            // Pagination buttons
+            const paginationEl = document.getElementById('um-pagination-btns');
+            let btns = '';
+            btns += `<button onclick="umGoPage(${umCurrentPage - 1})" ${umCurrentPage === 1 ? 'disabled' : ''}
+                class="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition">
+                <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                btns += `<button onclick="umGoPage(${i})"
+                    class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${i === umCurrentPage
+                        ? 'bg-green-600 text-white border-green-600'
+                        : 'border-gray-200 text-gray-600 hover:bg-gray-100'}">${i}</button>`;
+            }
+            btns += `<button onclick="umGoPage(${umCurrentPage + 1})" ${umCurrentPage === totalPages ? 'disabled' : ''}
+                class="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>`;
+            paginationEl.innerHTML = btns;
+
+            lucide.createIcons();
+        }
+
+        function umGoPage(page) {
+            const totalPages = Math.ceil(umFiltered.length / UM_PAGE_SIZE);
+            if (page < 1 || page > totalPages) return;
+            umCurrentPage = page;
+            renderUsersTable(umFiltered);
+        }
+
+        // ── Add / Edit Modal ──
+        function openAddUserModal() {
+            document.getElementById('modal-user-title').textContent = 'Tambah User';
+            document.getElementById('form-user').reset();
+            document.getElementById('edit-user-email-original').value = '';
+            document.getElementById('input-password-wrap').style.display = '';
+            document.getElementById('input-user-password').required = true;
+            document.getElementById('modal-user').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function openEditUserModal(emailEncoded) {
+            const email = decodeURIComponent(emailEncoded);
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const u = users.find(x => x.email === email);
+            if (!u) return;
+            document.getElementById('modal-user-title').textContent = 'Edit User';
+            document.getElementById('edit-user-email-original').value = u.email;
+            document.getElementById('input-user-name').value = u.name || '';
+            document.getElementById('input-user-email').value = u.email;
+            document.getElementById('input-user-role').value = u.role || 'user';
+            document.getElementById('input-password-wrap').style.display = 'none';
+            document.getElementById('input-user-password').required = false;
+            document.getElementById('modal-user').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeUserModal() {
+            document.getElementById('modal-user').classList.add('hidden');
+        }
+
+        function saveUser(e) {
+            e.preventDefault();
+            const originalEmail = document.getElementById('edit-user-email-original').value;
+            const name = document.getElementById('input-user-name').value.trim();
+            const email = document.getElementById('input-user-email').value.trim().toLowerCase();
+            const password = document.getElementById('input-user-password').value;
+            const role = document.getElementById('input-user-role').value;
+
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+
+            if (originalEmail) {
+                // Edit mode
+                const idx = users.findIndex(u => u.email === originalEmail);
+                if (idx === -1) return;
+                users[idx].name = name;
+                users[idx].email = email;
+                users[idx].role = role;
+                Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Data user diperbarui.', timer: 1500, showConfirmButton: false });
+            } else {
+                // Add mode
+                if (users.find(u => u.email === email)) {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: 'Email sudah terdaftar.' });
+                    return;
+                }
+                users.push({ name, email, password, role, donations: [], joinedEvents: [] });
+                Swal.fire({ icon: 'success', title: 'Berhasil', text: 'User baru ditambahkan.', timer: 1500, showConfirmButton: false });
+            }
+
+            localStorage.setItem('users', JSON.stringify(users));
+            closeUserModal();
+            renderUserManagement();
+        }
+
+        // ── Delete ──
+        function deleteUser(emailEncoded) {
+            const email = decodeURIComponent(emailEncoded);
+            const currentUser = getCurrentUser();
+            if (currentUser && currentUser.email === email) {
+                Swal.fire({ icon: 'warning', title: 'Tidak bisa', text: 'Anda tidak dapat menghapus akun yang sedang login.' });
+                return;
+            }
+            Swal.fire({
+                title: 'Hapus user ini?',
+                text: 'Tindakan ini tidak dapat dibatalkan.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonText: 'Batal',
+                confirmButtonText: 'Ya, Hapus'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    let users = JSON.parse(localStorage.getItem('users') || '[]');
+                    users = users.filter(u => u.email !== email);
+                    localStorage.setItem('users', JSON.stringify(users));
+                    renderUserManagement();
+                    Swal.fire({ icon: 'success', title: 'Dihapus', timer: 1200, showConfirmButton: false });
+                }
+            });
+        }
+
+        // ── Detail Modal ──
+        function viewUserDetail(emailEncoded) {
+            const email = decodeURIComponent(emailEncoded);
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const u = users.find(x => x.email === email);
+            if (!u) return;
+
+            const name = u.name || 'Eco Warrior';
+            const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            const totalDonasi = (u.donations || []).reduce((s, d) => s + (d.amount || 0), 0);
+            const agendaList = (u.joinedEvents || []).map(e => `<li class="text-xs text-gray-600 flex items-center gap-1.5"><i data-lucide="check-circle" class="w-3 h-3 text-green-500 flex-shrink-0"></i>${e.name || e}</li>`).join('');
+
+            document.getElementById('modal-detail-body').innerHTML = `
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xl font-bold">${initials}</div>
+                    <div>
+                        <p class="font-bold text-gray-900 text-base">${name}</p>
+                        <p class="text-sm text-gray-500">${u.email}</p>
+                        <span class="inline-block mt-1 px-2.5 py-0.5 text-[10px] font-bold rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'} uppercase">${u.role || 'user'}</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-gray-50 rounded-xl p-3">
+                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Total Donasi</p>
+                        <p class="font-bold text-gray-900 text-sm">${totalDonasi > 0 ? 'Rp ' + totalDonasi.toLocaleString('id-ID') : '—'}</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-3">
+                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Agenda Diikuti</p>
+                        <p class="font-bold text-gray-900 text-sm">${(u.joinedEvents || []).length} kegiatan</p>
+                    </div>
+                </div>
+                ${agendaList ? `<div class="mt-3"><p class="text-xs text-gray-400 uppercase font-bold tracking-widest mb-2">Daftar Agenda</p><ul class="space-y-1 max-h-32 overflow-y-auto">${agendaList}</ul></div>` : ''}
+                <button onclick="closeDetailModal()" class="w-full mt-4 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold transition">Tutup</button>
+            `;
+            document.getElementById('modal-user-detail').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeDetailModal() {
+            document.getElementById('modal-user-detail').classList.add('hidden');
+        }
+
+        function renderVolunteerMonitoring() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const tbody = document.getElementById('volunteers-table-body');
+            
+            let totalVolunteers = 0;
+            let totalEvents = 0;
+            let totalHours = 0;
+            let volunteerData = [];
+
+            users.forEach(u => {
+                const joinedEvents = u.joinedEvents || [];
+                if (joinedEvents.length > 0) {
+                    totalVolunteers++;
+                    totalEvents += joinedEvents.length;
+                    totalHours += joinedEvents.length * 8; // Assume 8 hours per event
+                    
+                    volunteerData.push({
+                        name: u.name || 'Eco Warrior',
+                        email: u.email,
+                        events: joinedEvents,
+                        eventCount: joinedEvents.length
+                    });
+                }
+            });
+
+            document.getElementById('vol-total').innerText = totalVolunteers;
+            document.getElementById('vol-hours').innerText = totalHours.toLocaleString('id-ID');
+            document.getElementById('vol-events').innerText = totalEvents;
+
+            if (volunteerData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-400 text-sm">Tidak ada relawan</td></tr>';
+                return;
+            }
+
+            let html = volunteerData.map(v => {
+                const eventsList = v.events.map(e => e.name).join(', ');
+                return `
+                    <tr class="hover:bg-gray-50 transition duration-200">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-bold text-gray-900">${v.name}</div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell text-xs text-gray-600">${v.email}</td>
+                        <td class="px-4 md:px-6 py-4">
+                            <div class="text-xs font-bold text-orange-600">${v.eventCount} Agenda</div>
+                            <div class="text-[10px] text-gray-400 truncate max-w-[150px] md:max-w-[200px]" title="${eventsList}">${eventsList}</div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                            <div class="text-sm font-bold text-gray-900">${v.eventCount}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tbody.innerHTML = html;
+            lucide.createIcons();
+
+            // Add search listener
+            document.getElementById('volunteerSearch').addEventListener('input', filterVolunteers);
+        }
+
+        function filterVolunteers() {
+            const searchVal = document.getElementById('volunteerSearch')?.value.toLowerCase() || '';
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const tbody = document.getElementById('volunteers-table-body');
+
+            const filtered = users.filter(u => {
+                const joinedEvents = u.joinedEvents || [];
+                if (joinedEvents.length === 0) return false;
+                
+                const eventNames = joinedEvents.map(e => e.name).join(', ').toLowerCase();
+                return u.name?.toLowerCase().includes(searchVal) || 
+                       u.email?.toLowerCase().includes(searchVal) ||
+                       eventNames.includes(searchVal);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-400 text-sm">Tidak ada hasil pencarian</td></tr>';
+                return;
+            }
+
+            let html = filtered.map(v => {
+                const eventsList = v.joinedEvents.map(e => e.name).join(', ');
+                return `
+                    <tr class="hover:bg-gray-50 transition duration-200">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-bold text-gray-900">${v.name || 'Eco Warrior'}</div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell text-xs text-gray-600">${v.email}</td>
+                        <td class="px-4 md:px-6 py-4">
+                            <div class="text-xs font-bold text-orange-600">${v.joinedEvents.length} Agenda</div>
+                            <div class="text-[10px] text-gray-400 truncate max-w-[150px] md:max-w-[200px]" title="${eventsList}">${eventsList}</div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap hidden md:table-cell">
+                            <div class="text-sm font-bold text-gray-900">${v.joinedEvents.length}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tbody.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            protectAdminRoute();
+
+            // Populate admin navbar user chip + apply lang
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (currentUser) {
+                document.getElementById('admin-username').textContent = currentUser.name || 'Admin';
+                const drawerName = document.getElementById('drawer-username');
+                if (drawerName) drawerName.textContent = currentUser.name || 'Admin';
+            }
+            adminApplyLang();
+            lucide.createIcons();
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const subs = JSON.parse(localStorage.getItem('newsletters') || '[]');
+            
+            let totalSysDonations = 0;
+            let totalVolunteers = 0;
+
+            const tbody = document.getElementById('user-table-body');
+            let rowsHtml = '';
+
+            users.forEach(u => {
+                // Kalkulasi Donasi
+                let userDonations = 0;
+                (u.donations || []).forEach(d => { userDonations += d.amount; });
+                totalSysDonations += userDonations;
+
+                // Monitoring Agenda/Relawan
+                const joinedEvents = u.joinedEvents || [];
+                const eventsCount = joinedEvents.length;
+                if(eventsCount > 0) totalVolunteers++;
+
+                const eventsList = eventsCount > 0 
+                    ? joinedEvents.map(e => e.name).join(', ') 
+                    : '<span class="text-gray-300 italic font-normal">Belum ada agenda</span>';
+
+                const roleBadge = u.role === 'admin' 
+                    ? `<span class="px-3 py-1 text-[10px] font-bold rounded-full bg-purple-100 text-purple-700 uppercase hidden sm:inline-block">Admin</span>`
+                    : `<span class="px-3 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700 uppercase hidden sm:inline-block">User</span>`;
+
+                rowsHtml += `
+                    <tr class="hover:bg-gray-50 transition duration-200">
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-bold text-gray-900">${u.name || 'Eco Warrior'}</div>
+                            <div class="text-xs text-gray-400 font-medium break-all">${u.email}</div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap hidden sm:table-cell">${roleBadge}</td>
+                        <td class="px-4 md:px-6 py-4">
+                            <div class="text-xs font-bold text-green-700">${eventsCount} Kegiatan</div>
+                            <div class="text-[10px] text-gray-400 truncate max-w-[150px] md:max-w-[200px]" title="${eventsList}">${eventsList}</div>
+                        </td>
+                        <td class="px-4 md:px-6 py-4 whitespace-nowrap font-bold text-gray-900 hidden md:table-cell text-sm">
+                            Rp ${(u.donations || []).reduce((sum, d) => sum + d.amount, 0).toLocaleString('id-ID')}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = rowsHtml || '<tr><td colspan="4" class="p-8 text-center text-gray-400 text-sm">Database kosong</td></tr>';
+
+            // Set aggregate stats
+            document.getElementById('ad-total-users').innerText = users.length;
+            document.getElementById('ad-total-volunteers').innerText = totalVolunteers;
+            document.getElementById('ad-total-donations').innerText = "Rp " + (totalSysDonations + 1250000000).toLocaleString('id-ID'); 
+            document.getElementById('ad-total-subs').innerText = subs.length + 152;
+
+            // Initialize sections
+            renderUserManagement();
+            renderVolunteerMonitoring();
+            updateUMKMBadge();
+
+            drawAdminCharts();
+            lucide.createIcons();
+        });
+
+        function drawAdminCharts() {
+            const ctx1 = document.getElementById('donationChart');
+            if (ctx1) {
+                new Chart(ctx1.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                        datasets: [{
+                            label: 'Donasi (Juta Rp)',
+                            data: [120, 190, 150, 220, 180, 250],
+                            borderColor: '#166534',
+                            backgroundColor: 'rgba(22, 101, 52, 0.08)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#166534',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { display: false },
+                            filler: { propagate: true }
+                        },
+                        scales: { 
+                            y: { 
+                                beginAtZero: true,
+                                grid: { color: 'rgba(0,0,0,0.05)' }
+                            },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            const ctx2 = document.getElementById('areaChart');
+            if (ctx2) {
+                new Chart(ctx2.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jabar', 'Jateng', 'Sumatera', 'Kaltim', 'Papua'],
+                        datasets: [{
+                            label: 'Pohon Ditanam',
+                            data: [15000, 8000, 25000, 32000, 5000],
+                            backgroundColor: ['#22c55e', '#16a34a', '#15803d', '#166534', '#14532d'],
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            hoverBackgroundColor: '#166534'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function clearDummyData() {
+            Swal.fire({
+                title: 'Reset Database Lokal?',
+                text: "Semua data user, agenda, dan donasi akan dihapus permanen dari browser ini.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Reset Sekarang',
+                cancelButtonText: 'Batalkan'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
+        // ── Admin Navbar: Lang + Drawer ──
+        function adminApplyLang() {
+            const lang = localStorage.getItem('lang') || 'id';
+            const t = translations[lang];
+            const btnLabel = lang === 'id' ? 'ID' : 'EN';
+            ['admin-lang-btn','admin-lang-btn-mobile'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = btnLabel;
+            });
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            // Navbar
+            set('admin-panel-label',      t.admin_panel);
+            set('admin-status-label',     t.admin_status);
+            set('admin-role-label',       t.admin_role);
+            set('admin-logout-label',     t.admin_logout);
+            // Drawer
+            set('drawer-panel-label',     t.admin_panel);
+            set('drawer-role-label',      t.admin_role);
+            set('drawer-logout-label',    t.admin_logout);
+            set('drawer-link-dashboard',  'Dashboard');
+            set('drawer-link-users',      t.nav_manage_users);
+            set('drawer-link-volunteers', t.admin_monitoring);
+            set('drawer-link-public',     t.admin_public);
+            set('drawer-lang-label',      t.admin_lang_switch);
+            // Sidebar
+            set('sidebar-menu-label',       t.admin_menu_label);
+            set('sidebar-link-dashboard',   'Dashboard');
+            set('sidebar-link-users',       t.nav_manage_users);
+            set('sidebar-link-volunteers',  t.admin_monitoring);
+            set('sidebar-link-public',      t.admin_public);
+        }
+
+        function adminToggleLang() {
+            let lang = localStorage.getItem('lang') || 'id';
+            lang = lang === 'id' ? 'en' : 'id';
+            localStorage.setItem('lang', lang);
+            adminApplyLang();
+        }
+
+        function adminOpenDrawer() {
+            document.getElementById('admin-mobile-drawer').classList.add('open');
+            document.getElementById('admin-drawer-overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function adminCloseDrawer() {
+            document.getElementById('admin-mobile-drawer').classList.remove('open');
+            document.getElementById('admin-drawer-overlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function adminLogout() {
+            Swal.fire({
+                title: 'Keluar dari Admin?',
+                text: 'Sesi admin Anda akan diakhiri.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('currentUser');
+                    Swal.fire({ icon: 'success', title: 'Berhasil Keluar', showConfirmButton: false, timer: 1200 })
+                        .then(() => { window.location.href = 'login.html'; });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

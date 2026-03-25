@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kamu - Eco Nusantara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Animasi halus untuk notifikasi */
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-in { animation: slideIn 0.5s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <div id="navbar-container"></div>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        <div id="event-reminder" class="hidden mb-8 bg-orange-50 border-l-4 border-orange-500 p-5 rounded-r-2xl shadow-sm animate-slide-in">
+            <div class="flex items-center">
+                <div class="bg-orange-100 p-2 rounded-full mr-4">
+                    <i data-lucide="bell-ring" class="text-orange-600 w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-orange-900 font-bold">Pengingat Agenda Terdekat!</p>
+                    <p class="text-orange-700 text-sm" id="reminder-text"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-extrabold font-serif text-gray-900 mb-2">Halo, <span id="dash-name" class="text-green-700"></span>! 👋</h1>
+                <p class="text-gray-600">Terima kasih telah bergabung dalam gerakan menyelamatkan bumi kita.</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex space-x-3">
+                <a href="donasi.html" class="bg-green-600 text-white px-6 py-2 rounded-full font-bold hover:bg-green-700 shadow flex items-center transition">
+                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Adopsi Lagi
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-white rounded-2xl shadow p-6 border-l-4 border-green-500 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 opacity-10 group-hover:scale-110 transition-transform"><i data-lucide="tree-pine" class="w-32 h-32 -mr-8 -mt-8"></i></div>
+                <div class="text-gray-500 text-sm font-medium mb-1">Pohon Diadopsi</div>
+                <div class="text-4xl font-black font-serif text-green-700" id="stat-trees">0</div>
+                <div class="text-xs text-green-600 font-bold mt-2">Dilahirkan olehmu</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow p-6 border-l-4 border-blue-500 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 opacity-10 group-hover:scale-110 transition-transform"><i data-lucide="cloud" class="w-32 h-32 -mr-8 -mt-8"></i></div>
+                <div class="text-gray-500 text-sm font-medium mb-1">Dampak Karbon (Estimasi)</div>
+                <div class="text-4xl font-black font-serif text-blue-700" id="stat-co2">0 <span class="text-lg">kg/thn</span></div>
+                <div class="text-xs text-blue-600 font-bold mt-2">Menyaring udara kotor</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow p-6 border-l-4 border-yellow-500 relative overflow-hidden group cursor-pointer hover:bg-yellow-50 transition" onclick="window.location.href='rewards.html'">
+                <div class="absolute right-0 top-0 opacity-10 group-hover:scale-110 transition-transform"><i data-lucide="award" class="w-32 h-32 -mr-8 -mt-8"></i></div>
+                <div class="text-gray-500 text-sm font-medium mb-1">Eco Points (Aktif)</div>
+                <div class="text-4xl font-black font-serif text-yellow-600" id="stat-pts">0</div>
+                <div class="text-xs text-yellow-600 font-bold mt-2 flex items-center">Klik untuk Redeem <i data-lucide="arrow-right" class="w-3 h-3 ml-1"></i></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold font-serif text-gray-900 text-lg">Riwayat Adopsi / Donasi</h3>
+                    </div>
+                    
+                    <div class="p-0">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-white">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi / Keterangan</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Pohon</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nominal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-container" class="bg-white divide-y divide-gray-100">
+                                    </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="empty-history" class="hidden p-12 text-center text-gray-500">
+                            <i data-lucide="file-x" class="mx-auto h-12 w-12 text-gray-300 mb-4"></i>
+                            <p>Belum ada riwayat donasi.</p>
+                            <a href="donasi.html" class="inline-block mt-4 text-green-600 font-bold border-b border-green-600">Mulai Adopsi Pertamamu!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 bg-green-50">
+                        <h3 class="font-bold text-gray-900 flex items-center">
+                            <i data-lucide="calendar-check" class="mr-2 text-green-600 w-5 h-5"></i> Agenda Volunteer Saya
+                        </h3>
+                    </div>
+                    <div id="my-events-list" class="p-5 space-y-4 max-h-[400px] overflow-y-auto">
+                        </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-md p-6 text-center border border-gray-100">
+                    <h3 class="font-bold text-gray-900 mb-6">Status Level</h3>
+                    <div class="w-32 h-32 mx-auto bg-green-50 rounded-full border-4 border-green-200 flex items-center justify-center relative mb-4 shadow-inner">
+                        <i data-lucide="leaf" class="w-16 h-16 text-green-600"></i>
+                        <div class="absolute -bottom-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">Eco Warrior</div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">Adopsi beberapa pohon lagi untuk naik level!</p>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-green-500 h-2 rounded-full w-[30%]"></div>
+                    </div>
+                </div>
+
+                <div id="latest-cert-card" class="bg-gradient-to-br from-green-800 to-green-600 rounded-2xl shadow-lg p-6 text-white text-center transform hover:scale-[1.02] transition-transform cursor-pointer hidden">
+                    <i data-lucide="award" class="mx-auto w-12 h-12 text-yellow-300 mb-3 drop-shadow"></i>
+                    <h3 class="font-bold text-lg mb-1">E-Sertifikat Tersedia</h3>
+                    <p class="text-green-100 text-sm mb-4">Sertifikat adopsi terakhir Anda.</p>
+                    <button onclick="downloadEStoreCertificate()" class="w-full bg-white text-green-800 font-bold py-2 rounded-full shadow-md text-sm transition-all active:scale-95 hover:bg-gray-100">Download Sertifikat</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+    <script src="./js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            protectRoute(); // Must be logged in
+            
+            const user = getCurrentUser();
+            if(user) {
+                // 1. Set text data
+                document.getElementById('dash-name').innerText = user.name || user.email.split('@')[0];
+                const totalTrees = user.treesAdopted || 0;
+                document.getElementById('stat-trees').innerText = totalTrees;
+                document.getElementById('stat-co2').innerText = totalTrees * 21;
+                document.getElementById('stat-pts').innerText = user.points || 0;
+
+                // 2. Logika Agenda & Notifikasi H-3
+                const listCont = document.getElementById('my-events-list');
+                const reminderBox = document.getElementById('event-reminder');
+                const reminderText = document.getElementById('reminder-text');
+                const joinedEvents = user.joinedEvents || [];
+                const today = new Date();
+
+                if(joinedEvents.length === 0) {
+                    listCont.innerHTML = `<p class="text-center text-gray-400 text-sm py-4 italic">Belum mengikuti agenda apapun.</p>`;
+                } else {
+                    let hasNearEvent = false;
+                    joinedEvents.forEach(ev => {
+                        const evDate = new Date(ev.date);
+                        const diffTime = evDate - today;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                        // Cek Notifikasi H-3 (0 sampai 3 hari ke depan)
+                        if(diffDays >= 0 && diffDays <= 3) {
+                            hasNearEvent = true;
+                            reminderText.innerText = `Kegiatan "${ev.name}" akan dilaksanakan dalam ${diffDays === 0 ? 'hari ini' : diffDays + ' hari lagi'}. Jangan lupa hadir ya!`;
+                        }
+
+                        // Render ke list agenda
+                        listCont.innerHTML += `
+                            <div class="flex items-start gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100 group hover:border-green-300 transition">
+                                <div class="bg-white p-2 rounded-lg shadow-sm text-center min-w-[50px]">
+                                    <span class="block text-[10px] font-bold text-gray-400 uppercase">${evDate.toLocaleString('id-ID', {month: 'short'})}</span>
+                                    <span class="block text-xl font-black text-green-700">${evDate.getDate()}</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800 text-sm leading-tight">${ev.name}</p>
+                                    <p class="text-[11px] text-gray-500 mt-1 flex items-center">
+                                        <i data-lucide="map-pin" class="w-3 h-3 mr-1"></i> ${ev.location}
+                                    </p>
+                                </div>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-[9px] font-bold uppercase self-start">Terdaftar</span>
+                            </div>
+                        `;
+                    });
+
+                    if(hasNearEvent) reminderBox.classList.remove('hidden');
+                }
+
+                // 3. Render Riwayat Transaksi
+                const histCont = document.getElementById('history-container');
+                const emptyState = document.getElementById('empty-history');
+                const donations = user.donations || [];
+
+                if(donations.length === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    document.getElementById('latest-cert-card').classList.remove('hidden');
+                    
+                    let html = '';
+                    donations.forEach(d => {
+                        const dDate = new Date(d.date);
+                        const dateStr = `${dDate.getDate()}/${dDate.getMonth()+1}/${dDate.getFullYear()}`;
+                        html += `
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${dateStr}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">${d.location || 'EcoNusantara Area'}</div>
+                                    <div class="text-xs text-gray-500">Donasi Pohon</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        +${d.trees} Pohon
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-900">
+                                    Rp ${(d.amount || d.trees * 50000).toLocaleString('id-ID')}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    histCont.innerHTML = html;
+                }
+                // Re-init icons for dynamic elements
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+</html>

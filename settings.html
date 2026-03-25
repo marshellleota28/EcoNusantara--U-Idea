@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan - Eco Nusantara</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <div id="navbar-container"></div>
+
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+        <h1 class="text-3xl font-extrabold font-serif text-gray-900 mb-8">Pengaturan Akun</h1>
+
+        <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+            <div class="p-6 md:p-8 border-b border-gray-100">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center"><i data-lucide="user" class="mr-2 text-green-600"></i> Profil Personal</h3>
+                <form id="profile-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                            <input type="text" id="set-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Alamat Email (Tidak dapat diubah)</label>
+                            <input type="email" id="set-email" disabled class="mt-1 block w-full bg-gray-100 border border-gray-300 rounded-md shadow-sm py-2 px-3 text-gray-500 cursor-not-allowed">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nomor Telepon / WhatsApp</label>
+                        <input type="text" id="set-phone" placeholder="08123456789" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="button" onclick="saveProfile()" class="bg-green-600 text-white font-bold py-2 px-6 rounded-md hover:bg-green-700 transition">Simpan Profil</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="p-6 md:p-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center"><i data-lucide="lock" class="mr-2 text-gray-600"></i> Ganti Password</h3>
+                <form id="password-form" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Password Baru</label>
+                        <input type="password" id="set-new-pass" required minlength="6" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Konfirmasi Password Baru</label>
+                        <input type="password" id="set-conf-pass" required minlength="6" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="button" onclick="savePassword()" class="bg-gray-800 text-white font-bold py-2 px-6 rounded-md hover:bg-gray-900 transition">Update Password</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="p-6 md:p-8 border-t border-gray-100 bg-red-50">
+                 <h3 class="text-xl font-bold text-red-700 mb-2 flex items-center"><i data-lucide="alert-triangle" class="mr-2 text-red-600"></i> Danger Zone</h3>
+                 <p class="text-sm text-red-600 mb-4">Aksi ini tidak dapat dibatalkan. Semua riwayat donasi dan poin akan hilang.</p>
+                 <button onclick="deleteAccount()" class="border border-red-300 text-red-700 font-bold py-2 px-6 rounded-md hover:bg-red-100 transition">Hapus Akun Permanen</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+    <script src="./js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            protectRoute();
+            const user = getCurrentUser();
+            if(user) {
+                document.getElementById('set-name').value = user.name || "";
+                document.getElementById('set-email').value = user.email || "";
+                document.getElementById('set-phone').value = user.phone || "";
+            }
+        });
+
+        function saveProfile() {
+            const newName = document.getElementById('set-name').value;
+            const newPhone = document.getElementById('set-phone').value;
+            
+            if(!newName) return;
+
+            let user = getCurrentUser();
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            let userIndex = users.findIndex(u => u.email === user.email);
+            
+            if (userIndex !== -1) {
+                users[userIndex].name = newName;
+                users[userIndex].phone = newPhone;
+                
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Tersimpan',
+                    text: 'Profil berhasil diupdate.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+
+        function savePassword() {
+            const pass1 = document.getElementById('set-new-pass').value;
+            const pass2 = document.getElementById('set-conf-pass').value;
+
+            if(pass1.length < 6) {
+                Swal.fire({ icon: 'error', text: 'Password minimal 6 karakter!'});
+                return;
+            }
+
+            if(pass1 !== pass2) {
+                Swal.fire({ icon: 'error', text: 'Password tidak cocok!'});
+                return;
+            }
+
+            let user = getCurrentUser();
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            let userIndex = users.findIndex(u => u.email === user.email);
+            
+            if (userIndex !== -1) {
+                users[userIndex].password = pass1;
+                
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // Do not update currentUser's password in localstorage if we don't store plain, but we are doing dummy.
+                const updatedUser = users[userIndex];
+                localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+                document.getElementById('set-new-pass').value = '';
+                document.getElementById('set-conf-pass').value = '';
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Password Diubah',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+
+        function deleteAccount() {
+            Swal.fire({
+                title: 'Apakah Kamu Yakin?',
+                text: "Semua riwayat akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus Akun'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let user = getCurrentUser();
+                    let users = JSON.parse(localStorage.getItem('users') || '[]');
+                    users = users.filter(u => u.email !== user.email);
+                    localStorage.setItem('users', JSON.stringify(users));
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Dihapus!',
+                        text: 'Akun telah terhapus.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        logout(); // clears currentUser and redirects
+                    });
+                }
+            })
+        }
+    </script>
+</body>
+</html>

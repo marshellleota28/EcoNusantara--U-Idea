@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edukasi - Eco Nusantara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <div id="navbar-container"></div>
+
+   <div class="relative py-24 overflow-hidden">
+    <img src="https://images.unsplash.com/photo-1442120108414-42e7ea50d0b5?q=80&w=1549&auto=format&fit=crop" 
+         alt="Latar Belakang Edukasi" 
+         class="absolute inset-0 w-full h-full object-cover">
+    
+    <div class="absolute inset-0 bg-emerald-950/60 backdrop-blur-[2px]"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold font-serif text-white mb-6 drop-shadow-lg">
+            Pusat Edukasi Lingkungan
+        </h1>
+        <p class="text-lg md:text-xl text-green-50 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+            Pelajari lebih lanjut tentang pentingnya reboisasi, jenis-jenis pohon endemik, dan cara menjaga bumi mulai dari rumah.
+        </p>
+    </div>
+</div>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- Search & Filter Area -->
+        <div class="mb-10 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="relative w-full md:w-1/2">
+                <input type="text" placeholder="Cari artikel edukasi..." class="w-full pl-10 pr-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm">
+                <i data-lucide="search" class="absolute left-4 top-3.5 h-5 w-5 text-gray-400"></i>
+            </div>
+        <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+            <button onclick="filterEdu('all', this)" class="filter-btn px-4 py-2 rounded-full bg-green-600 text-white font-medium text-sm whitespace-nowrap active-filter">Semua</button>
+            <button onclick="filterEdu('Jenis Pohon', this)" class="filter-btn px-4 py-2 rounded-full bg-white border border-gray-300 text-gray-600 hover:bg-green-50 font-medium text-sm whitespace-nowrap">Jenis Pohon</button>
+            <button onclick="filterEdu('Krisis Iklim', this)" class="filter-btn px-4 py-2 rounded-full bg-white border border-gray-300 text-gray-600 hover:bg-green-50 font-medium text-sm whitespace-nowrap">Krisis Iklim</button>
+            <button onclick="filterEdu('Tutorial', this)" class="filter-btn px-4 py-2 rounded-full bg-white border border-gray-300 text-gray-600 hover:bg-green-50 font-medium text-sm whitespace-nowrap">Tutorial</button>
+        </div>
+
+        <div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <article data-category="Jenis Pohon" class="edu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all">
+                </article>
+
+            <article data-category="Tutorial" class="edu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all">
+                </article>
+
+            <article data-category="Krisis Iklim" class="edu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all">
+                </article>
+        </div>
+    </div>
+    
+<div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500">
+    
+    <article data-category="Jenis Pohon" class="edu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 opacity-100">
+        <img src="https://dlh.bulelengkab.go.id/uploads/konten/60-pentingnya-hutan-mangrove-bagi-lingkungan-hidup.jpg" alt="Mangrove" class="w-full h-48 object-cover">
+        <div class="p-6">
+            <span class="text-xs font-bold text-green-600 uppercase tracking-wider mb-2 block">Jenis Pohon</span>
+            <h3 class="text-xl font-bold font-serif text-gray-900 mb-2">Mengapa Mangrove Begitu Penting?</h3>
+            <p class="text-gray-600 mb-4 line-clamp-3">Mangrove bukan hanya menahan abrasi, tapi juga mampu menyerap karbon hingga 4 kali lebih banyak...</p>
+            <button onclick="showFullArticle('mangrove')" class="text-green-600 font-bold hover:text-green-800 flex items-center">
+                Baca Selengkapnya <i data-lucide="arrow-right" class="h-4 w-4 ml-1"></i>
+            </button>
+        </div>
+    </article>
+
+    <article data-category="Tutorial" class="edu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 opacity-100">
+        <img src="https://jubelio-store.s3.ap-southeast-1.amazonaws.com/sustaination/2021/05/13175631/apa-itu-kompos-2.jpeg" alt="Kompos" class="w-full h-48 object-cover">
+        <div class="p-6">
+            <span class="text-xs font-bold text-yellow-600 uppercase tracking-wider mb-2 block">Tutorial</span>
+            <h3 class="text-xl font-bold font-serif text-gray-900 mb-2">Membuat Kompos Organik di Rumah Kecil</h3>
+            <p class="text-gray-600 mb-4 line-clamp-3">Ubah sisa makanan Anda menjadi pupuk penyubur tanaman. Panduan langkah demi langkah tanpa bau.</p>
+            <button onclick="showFullArticle('kompos')" class="text-green-600 font-bold hover:text-green-800 flex items-center">
+                Baca Selengkapnya <i data-lucide="arrow-right" class="h-4 w-4 ml-1"></i>
+            </button>
+        </div>
+    </article>
+
+    <article data-category="Krisis Iklim" class="edu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 opacity-100">
+        <img src="https://b3411452.smushcdn.com/3411452/wp-content/uploads/2024/12/1e70f34c3f5b48a4b305db53358169d0-e1734524502599.webp?lossy=2&strip=1&webp=1" alt="Kalimantan" class="w-full h-48 object-cover">
+        <div class="p-6">
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 block">Krisis Iklim</span>
+            <h3 class="text-xl font-bold font-serif text-gray-900 mb-2">Dampak Nyata Deforestasi di Kalimantan</h3>
+            <p class="text-gray-600 mb-4 line-clamp-3">Bagaimana hilangnya tutupan hutan memicu banjir besar yang tidak pernah terjadi sebelumnya...</p>
+            <button onclick="showFullArticle('deforestasi')" class="text-green-600 font-bold hover:text-green-800 flex items-center">
+                Baca Selengkapnya <i data-lucide="arrow-right" class="h-4 w-4 ml-1"></i>
+            </button>
+        </div>
+    </article>
+
+    <article data-category="Krisis Iklim" class="edu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 opacity-100">
+        <img src="https://cdn0-production-images-kly.akamaized.net/MCnm_BhepiyoHtsNiMv16vXNpl0=/500x0/smart/filters:quality(75):strip_icc()/kly-media-production/medias/5330794/original/033603200_1756367822-3.jpg" alt="Pantura" class="w-full h-48 object-cover">
+        <div class="p-6">
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 block">Krisis Iklim</span>
+            <h3 class="text-xl font-bold font-serif text-gray-900 mb-2">Kenaikan Air Laut di Pesisir Jawa</h3>
+            <p class="text-gray-600 mb-4 line-clamp-3">Kombinasi pemanasan global dan penurunan muka tanah membuat kota-kota pesisir berisiko terendam.</p>
+            <button onclick="showFullArticle('air_laut')" class="text-green-600 font-bold hover:text-green-800 flex items-center">
+                Baca Selengkapnya <i data-lucide="arrow-right" class="h-4 w-4 ml-1"></i>
+            </button>
+        </div>
+    </article>
+
+</div>
+
+        <div id="quiz-section" class="mt-16 bg-gradient-to-r from-green-800 to-green-600 rounded-3xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
+            <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
+                <i data-lucide="help-circle" class="w-64 h-64"></i>
+            </div>
+            
+            <div class="relative z-10 text-center" id="quiz-container">
+                <span class="inline-block py-1 px-3 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-400/30 text-xs font-bold mb-4 uppercase tracking-widest">
+                    Daily Challenge (5 Questions)
+                </span>
+                <h2 class="text-3xl font-extrabold font-serif mb-2">Kuis Harian: Cek Wawasanmu!</h2>
+                <p class="text-lg text-green-100 mb-6">Progres: <span id="quiz-progress">1</span>/5 | Poin Terkumpul: <span id="temp-points">0</span></p>
+                
+                <div id="quiz-content" class="max-w-xl mx-auto bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                    <p id="quiz-question" class="text-xl font-medium mb-6">Memuat pertanyaan...</p>
+                    <div id="quiz-options" class="grid grid-cols-1 gap-3">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+ </main>
+
+    <div id="footer-container"></div>
+    <script src="./js/app.js"></script>
+</body>
+</html>
