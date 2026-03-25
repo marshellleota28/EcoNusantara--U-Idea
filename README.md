@@ -1,10 +1,13 @@
 # Eco Nusantara 🌿
 
-> **"Tanam Pohon Hari Ini, Selamatkan Masa Depan Indonesia"**
+[![Status](https://img.shields.io/badge/Status-Prototype-brightgreen?style=for-the-badge)](https://github.com/michaeljuliosonda/eco-nusantara)
+[![Tech](https://img.shields.io/badge/Tech-Vanilla_JS_--_Tailwind-blue?style=for-the-badge)](https://github.com/michaeljuliosonda/eco-nusantara)
 
-Platform reboisasi komunitas berbasis web untuk mendukung penghijauan Indonesia. Dibangun sepenuhnya dengan HTML, Tailwind CSS, dan Vanilla JavaScript — tanpa framework, tanpa build tool, tanpa backend. Semua data disimpan di `localStorage` browser sebagai simulasi database.
+> *"Satu Klik, Satu Pohon, Seribu Harapan untuk Indonesia."*
 
-> **Cara menambahkan screenshot nyata:** Buat folder `screenshots/` di root project, ambil screenshot setiap halaman, simpan sesuai nama file yang tertera di setiap bagian, lalu ganti URL `via.placeholder.com` dengan path relatif `screenshots/nama-file.png`.
+*EcoNusantara* adalah platform reboisasi komunitas berbasis web yang mendemokrasikan aksi penghijauan di Indonesia. Kami menjembatani kepedulian masyarakat dengan upaya pemulihan ekosistem melalui antarmuka yang modern, ringan, dan transparan.
+
+Dibangun dengan filosofi *"Back to Basics", project ini memaksimalkan potensi penuh dari teknologi web fundamental (HTML, Tailwind CSS, & Vanilla JS) untuk menciptakan pengalaman pengguna yang mulus tanpa beban framework berat. Seluruh sistem data dikelola secara cerdas menggunakan localStorage sebagai simulasi database *client-side.
 
 ---
 
