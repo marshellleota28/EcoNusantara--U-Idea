@@ -400,8 +400,8 @@ register.html
 
 ### ℹ️ Tentang Kami — `about.html`
 
-![about](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/about.png)
-> Ganti dengan: `screenshots/about.png`
+![about](gambar/32.jpeg)
+![about](gambar/33.jpeg)
 
 - Narasi "Mengapa Kami Mulai?"
 - Galeri Before-After Swiper.js (2 slide):
@@ -478,8 +478,7 @@ register.html
 
 ## Sistem Eco Points
 
-![ecopoints](https://via.placeholder.com/1280x320/92400e/ffffff?text=📸+Screenshot+→+screenshots/ecopoints.png)
-> Ganti dengan: `screenshots/ecopoints.png`
+![ecopoints](gambar/gambar16.png)
 
 | Aktivitas | Poin |
 |-----------|------|
@@ -509,8 +508,7 @@ Semua PDF di-generate client-side menggunakan **jsPDF** tanpa server.
 
 ## EcoBot AI (Groq)
 
-![ecobot](https://via.placeholder.com/1280x640/065f46/ffffff?text=📸+Screenshot+→+screenshots/ecobot.png)
-> Ganti dengan: `screenshots/ecobot.png`
+![ecobot](gambar/34.png)
 
 Chatbot floating di semua halaman, powered by **Groq API** model `llama-3.3-70b-versatile`.
 
@@ -525,8 +523,8 @@ Chatbot floating di semua halaman, powered by **Groq API** model `llama-3.3-70b-
 
 ## Internasionalisasi (i18n)
 
-![i18n](https://via.placeholder.com/1280x320/1e40af/ffffff?text=📸+Screenshot+→+screenshots/i18n-en.png)
-> Ganti dengan: `screenshots/i18n-en.png` (navbar dalam mode bahasa EN)
+![i18n](gambar/30.png)
+![i18n](gambar/31.png)
 
 - Toggle tombol `ID/EN` di navbar
 - Bahasa disimpan di `localStorage.lang`, halaman reload otomatis
