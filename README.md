@@ -241,8 +241,7 @@ register.html
 
 ### 🔐 Login — `login.html`
 
-![login](https://via.placeholder.com/1280x640/1e40af/ffffff?text=📸+Screenshot+→+screenshots/login.png)
-> Ganti dengan: `screenshots/login.png`
+![index](gambar/gambar2.png)
 
 - Form email + password
 - Fitur "Ingat Saya" (simpan ke localStorage)
@@ -254,8 +253,7 @@ register.html
 
 ### 📝 Registrasi — `register.html`
 
-![register](https://via.placeholder.com/1280x640/1e40af/ffffff?text=📸+Screenshot+→+screenshots/register.png)
-> Ganti dengan: `screenshots/register.png`
+![registrasi](gambar/gambar8.png)
 
 - Form: nama, telepon, email, password, konfirmasi password
 - Validasi: password min 6 karakter, password match, email unik
@@ -265,8 +263,7 @@ register.html
 
 ### 📊 Dashboard User — `dashboard.html`
 
-![dashboard](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/dashboard.png)
-> Ganti dengan: `screenshots/dashboard.png`
+![dashboard](gambar/gambar3.png)
 
 - Greeting: "Halo, [Nama]! 👋"
 - Banner notifikasi H-3 (oranye) jika ada event dalam 3 hari
@@ -280,8 +277,7 @@ register.html
 
 ### 🌱 Donasi Pohon — `donasi.html`
 
-![donasi](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/donasi.png)
-> Ganti dengan: `screenshots/donasi.png`
+![donasi](gambar/gambar4.png)
 
 - Guest mode: field nama & email tampil + banner peringatan anonim
 - Login mode: nama & email auto-fill, field tersembunyi
@@ -296,11 +292,7 @@ register.html
 
 ### 🗺️ Peta Penanaman — `peta.html`
 
-![peta](https://via.placeholder.com/1280x640/0f766e/ffffff?text=📸+Screenshot+→+screenshots/peta.png)
-> Ganti dengan: `screenshots/peta.png`
-
-![peta-popup](https://via.placeholder.com/1280x640/0f766e/ffffff?text=📸+Screenshot+→+screenshots/peta-popup.png)
-> Ganti dengan: `screenshots/peta-popup.png` (popup marker terbuka)
+![peta](gambar/gambar5.png)
 
 - Peta Leaflet.js (OpenStreetMap tile)
 - 5 marker: merah (kritis), kuning (pemulihan), hijau (sukses)
@@ -312,8 +304,7 @@ register.html
 
 ### 📅 Agenda Volunteer — `events.html`
 
-![events](https://via.placeholder.com/1280x640/92400e/ffffff?text=📸+Screenshot+→+screenshots/events.png)
-> Ganti dengan: `screenshots/events.png`
+![events](gambar/gambar6.png)
 
 - Filter: lokasi, jenis kegiatan, kalender tanggal
 - 3 event: 25 Mar (Mangrove), 02 Apr (Orangutan/PENUH), 14 Apr (Edukasi Tani)
@@ -334,8 +325,8 @@ register.html
 
 ### 🛒 Eco Market — `marketplace.html`
 
-![marketplace](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/marketplace.png)
-> Ganti dengan: `screenshots/marketplace.png`
+![marketplace](gambar/gambar7.png)
+
 
 ![marketplace-cart](https://via.placeholder.com/1280x640/166534/ffffff?text=📸+Screenshot+→+screenshots/marketplace-cart.png)
 > Ganti dengan: `screenshots/marketplace-cart.png` (modal keranjang terbuka)
