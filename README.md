@@ -232,6 +232,9 @@ index.html
   ├── Search bar navbar (fuzzy search ke semua halaman)
   └── EcoBot AI (floating button kanan bawah)
 
+![Uploading image.png…]()
+
+
 donasi.html (tanpa login)
   ├── Form tampil dengan field nama & email (guest mode)
   ├── Peringatan kuning: "Donasi sebagai Anonim"
