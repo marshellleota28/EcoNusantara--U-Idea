@@ -178,7 +178,53 @@ localStorage.setItem('users', JSON.stringify(users));
 
 ---
 
+<<<<<<< HEAD
 ## Detail Setiap Halaman & Screenshot
+=======
+## Alur Lengkap Per Role
+
+### 1. Guest (Belum Login)
+
+```
+index.html
+  ├── Hero slider 4 slide (auto-play 5 detik, swipe support)
+  ├── Impact counter: 124.536 pohon | 2.615 ton CO2 | 842 petani
+  ├── Preview 3 event mendatang → events.html
+  ├── Testimoni carousel (Swiper.js)
+  ├── Navbar: Home, Peta, Donasi, Edukasi, Eco Market, Transparansi, Events
+  ├── Search bar navbar (fuzzy search ke semua halaman)
+  └── EcoBot AI (floating button kanan bawah)
+
+![Uploading image.png…]()
+
+
+donasi.html (tanpa login)
+  ├── Form tampil dengan field nama & email (guest mode)
+  ├── Peringatan kuning: "Donasi sebagai Anonim"
+  ├── Pilih area penanaman (6 opsi + "Terserah Tim")
+  ├── Pilih jumlah: 1/3/10 pohon atau custom nominal
+  ├── Tipe: Sekali Bayar atau Bulanan (Recurring)
+  ├── Metode: QRIS / BCA VA / Mandiri VA / Kartu Kredit
+  ├── Simulasi loading 1.5 detik → sukses
+  ├── Data TIDAK tersimpan ke localStorage (guest)
+  └── Download invoice PDF (jsPDF)
+
+peta.html
+  ├── Peta Leaflet.js (OpenStreetMap)
+  ├── 5 marker lokasi: Muara Gembong, Lembang, Leuser, Merbabu, Kalimantan
+  ├── Warna marker: merah (kritis), kuning (pemulihan), hijau (sukses)
+  ├── Popup per marker: foto, survival rate, jumlah pohon, tombol adopsi
+  ├── Filter: provinsi + jenis pohon (checkbox)
+  └── Klik "Adopsi Pohon di Sini" → redirect ke donasi.html?area=...
+
+register.html
+  ├── Form: nama, telepon, email, password, konfirmasi password
+  ├── Validasi: password min 6 karakter, password match, email unik
+  ├── Simpan ke localStorage users[]
+  ├── Auto-login setelah daftar
+  └── Redirect ke dashboard.html
+```
+>>>>>>> aaf99386c46fcad6494289bf898c59320d5ea0aa
 
 ---
 
