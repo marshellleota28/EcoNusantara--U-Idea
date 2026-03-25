@@ -13,6 +13,7 @@ Dibangun dengan filosofi *"Back to Basics", project ini memaksimalkan potensi pe
 
 ## Daftar Isi
 
+1. [Fitur Unggulan](#fitur-unggulan)
 1. [Tech Stack](#tech-stack)
 2. [Struktur File](#struktur-file)
 3. [Cara Menjalankan](#cara-menjalankan)
@@ -28,6 +29,17 @@ Dibangun dengan filosofi *"Back to Basics", project ini memaksimalkan potensi pe
 13. [Catatan Pengembangan](#catatan-pengembangan)
 
 ---
+
+## Fitur Unggulan
+
+* *🌱 Smart Donation System:* Adopsi pohon di berbagai titik kritis Indonesia dengan sertifikat digital instan sebagai bukti kontribusi nyata.
+* *🗺️ Interactive Planting Map:* Monitoring lokasi penanaman secara real-time menggunakan *Leaflet.js* di berbagai wilayah konservasi terpantau.
+* *🤖 EcoBot AI:* Asisten cerdas berbasis LLM (*Groq API*) yang siap menjawab pertanyaan seputar lingkungan, krisis iklim, dan reboisasi secara interaktif.
+* *🤝 UMKM Partnership & Integration:* Kolaborasi strategis dengan pelaku usaha lokal untuk menyediakan produk ramah lingkungan, memperkuat ekonomi sirkular masyarakat di sekitar area penanaman.
+* *🛍️ Eco Market:* Digital marketplace khusus produk UMKM hijau yang menyisihkan 10% keuntungan dari setiap transaksi untuk dana reboisasi berkelanjutan.
+* *📊 Transparency Dashboard:* Laporan alokasi dana dan audit keuangan real-time yang dapat diunduh dalam format *PDF* secara transparan.
+* *🏆 Eco Rewards:* Sistem gamifikasi (*Eco Points*) yang dapat ditukarkan dengan produk eksklusif atau dikonversi kembali menjadi bibit pohon tambahan.
+
 
 ## Tech Stack
 
