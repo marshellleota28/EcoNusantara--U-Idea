@@ -229,7 +229,7 @@ register.html
 
 ### 🏠 Landing Page — `index.html`
 
-![index](C:\Users\ASUS\EcoNusantara - U-Idea\gambar1.png)
+![index](gambar1.png)
 > Ganti dengan: `screenshots/index.png`
 
 - Hero slider 4 slide (auto-play 5 detik, swipe support, teks dinamis per slide)
