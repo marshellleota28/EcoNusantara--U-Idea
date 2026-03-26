@@ -239,7 +239,6 @@ register.html
   └── Redirect ke dashboard.html
 ```
 
-
 ---
 
 ### 🏠 Landing Page — `index.html`
