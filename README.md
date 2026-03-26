@@ -606,3 +606,8 @@ Chatbot floating di semua halaman, powered by **Groq API** model `llama-3.3-70b-
 - Donasi guest tidak tersimpan (hanya user login yang datanya persisten)
 - Statistik landing page (124.536 pohon, dll) adalah data statis hardcoded
 - Untuk deployment produksi diperlukan: backend API, database, autentikasi proper, environment variables
+
+
+## Link Website
+http://eco-nusantara.web.id/
+
